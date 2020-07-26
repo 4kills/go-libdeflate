@@ -2,7 +2,7 @@ package native
 
 /* #include <stdint.h>
 
-size_t convert(unsigned long long integer) {
+static size_t convert(unsigned long long integer) {
 	return (size_t) integer;
 }
 */
