@@ -2,15 +2,9 @@ package native
 
 /*
 #include "libdeflate.h"
+#include "helper.h"
 
 typedef struct libdeflate_compressor comp;
-
-int isNull(comp* c) {
-	if(!c) {
-		return 1;
-	}
-	return 0;
-}
 */
 import "C"
 import "unsafe"
@@ -29,7 +23,7 @@ func NewCompressor(lvl int) (*Compressor, error) {
 	}
 
 	c := C.libdeflate_alloc_compressor(C.int(lvl))
-	if C.isNull(c) == 1 {
+	if C.isNull(unsafe.Pointer(c)) == 1 {
 		return nil, errorOutOfMemory
 	}
 

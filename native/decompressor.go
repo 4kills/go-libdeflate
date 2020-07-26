@@ -2,17 +2,12 @@ package native
 
 /*
 #include "libdeflate.h"
+#include "helper.h"
 
 typedef struct libdeflate_decompressor decomp;
-
-int isNull(decomp* c) {
-	if(!c) {
-		return 1;
-	}
-	return 0;
-}
 */
 import "C"
+import "unsafe"
 
 // Decompressor decompresses any DEFLATE, zlib or gzip compressed data at any level
 type Decompressor struct {
@@ -22,9 +17,9 @@ type Decompressor struct {
 // NewDecompressor returns a new Decompressor or and error if out of memory
 func NewDecompressor() (*Decompressor, error) {
 	dc := C.libdeflate_alloc_decompressor()
-	if C.isNull(dc) == 1 {
+	if C.isNull(unsafe.Pointer(dc)) == 1 {
 		return nil, errorOutOfMemory
 	}
 
-	return &Decompressor{dc}
+	return &Decompressor{dc}, nil
 }
