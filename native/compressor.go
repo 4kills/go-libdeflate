@@ -22,7 +22,7 @@ type Compressor struct {
 // NewCompressor returns a new Compressor used to compress data.
 // Errors if out of memory or invalid lvl
 func NewCompressor(lvl int) (*Compressor, error) {
-	if lvl < minLevel || lvl > maxLevel {
+	if lvl < MinCompressionLevel || lvl > MaxCompressionLevel {
 		return nil, errorInvalidLevel
 	}
 

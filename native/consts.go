@@ -1,8 +1,8 @@
 package native
 
 const (
-	minLevel        = 1
-	maxStdZlibLevel = 9
-	maxLevel        = 12
-	defaultLevel    = 6
+	MinCompressionLevel        = 1
+	MaxStdZlibCompressionLevel = 9
+	MaxCompressionLevel        = 12
+	DefaultCompressionLevel    = 6
 )
