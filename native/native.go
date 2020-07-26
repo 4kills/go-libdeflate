@@ -1,6 +1,6 @@
 package native
 
-func startMemAddress(b []byte) *byte {
+func startMemAddr(b []byte) *byte {
 	if len(b) > 0 {
 		return &b[0]
 	}

@@ -1,8 +1,16 @@
 package native
 
-import "testing"
+import (
+	"bytes"
+	"compress/zlib"
+	"testing"
+)
 
 var shortString = []byte("hello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\n")
+
+/*---------------------
+		UNIT TESTS
+-----------------------*/
 
 func TestNewCompressor(t *testing.T) {
 	c, err := NewCompressor(defaultLevel)
@@ -17,8 +25,40 @@ func TestNewCompressor(t *testing.T) {
 	}
 }
 
-// this test doesn't really say much - integration tests will show correctnes
+func TestCompressMaxComp(t *testing.T) {
+	c, _ := NewCompressor(maxStdZlibLevel)
+	defer c.Close()
+	_, comp, err := c.Compress(shortString, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r, _ := zlib.NewReader(bytes.NewBuffer(comp))
+	defer r.Close()
+	decomp := make([]byte, len(shortString))
+	r.Read(decomp)
+
+	slicesEqual([]byte(shortString), decomp, t)
+}
+
 func TestCompress(t *testing.T) {
+	c, _ := NewCompressor(defaultLevel)
+	defer c.Close()
+	_, comp, err := c.Compress(shortString, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r, _ := zlib.NewReader(bytes.NewBuffer(comp))
+	defer r.Close()
+	decomp := make([]byte, len(shortString))
+	r.Read(decomp)
+
+	slicesEqual([]byte(shortString), decomp, t)
+}
+
+// this test doesn't really say as much as TestCompress
+func TestCompressMeta(t *testing.T) {
 	c, _ := NewCompressor(defaultLevel)
 	defer c.Close()
 
@@ -41,6 +81,31 @@ func TestCompress(t *testing.T) {
 
 	slicesEqual(out, out2[:n], t) //tests if rep produces same results
 }
+
+/*---------------------
+	INTEGRATION TESTS
+-----------------------*/
+
+func TestCompressDecompress(t *testing.T) {
+	c, _ := NewCompressor(defaultLevel)
+	defer c.Close()
+	_, comp, err := c.Compress(shortString, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	out := make([]byte, len(shortString))
+	dc, _ := NewDecompressor()
+	defer dc.Close()
+	if _, err := dc.Decompress(comp, out); err != nil {
+		t.Error(err)
+	}
+	slicesEqual([]byte(shortString), out, t)
+}
+
+/*---------------------
+		HELPER
+-----------------------*/
 
 func slicesEqual(expected, actual []byte, t *testing.T) {
 	if len(expected) != len(actual) {

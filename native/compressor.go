@@ -2,18 +2,15 @@ package native
 
 /*
 #include "libdeflate.h"
+#include "helper.h"
 
 typedef struct libdeflate_compressor comp;
-
-int isNull(comp* c) {
-	if(!c) {
-		return 1;
-	}
-	return 0;
-}
 */
 import "C"
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 // Compressor compresses data to zlib format at the specified level
 type Compressor struct {
@@ -29,7 +26,7 @@ func NewCompressor(lvl int) (*Compressor, error) {
 	}
 
 	c := C.libdeflate_alloc_compressor(C.int(lvl))
-	if C.isNull(c) == 1 {
+	if C.isNull(unsafe.Pointer(c)) == 1 {
 		return nil, errorOutOfMemory
 	}
 
@@ -39,28 +36,35 @@ func NewCompressor(lvl int) (*Compressor, error) {
 // Compress compresses the data from in to out and returns the number
 // of bytes written to out, out and an error if the out buffer was too short.
 // If you pass nil for out, this function will allocate a fitting buffer and return it.
+//
+// Notice that for extremely small or already highly compressed data,
+// the compressed data could be larger than uncompressed.
+// If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
 func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
 	if len(in) == 0 {
 		return 0, out, errorNoInput
 	}
 
 	if out != nil {
-		return c.compress(in, out)
+		n, b, err := c.compress(in, out)
+		return n, b[:n], err
 	}
 
 	out = make([]byte, len(in))
 	n, out, err := c.compress(in, out)
-	if err != nil {
-		copy(out, in)
-		return len(in), out[:len(in)], nil
+
+	if err == errorShortBuffer { // if still doesn't fit (shouldn't happen at all)
+		out = make([]byte, 1000+len(in)*2)
+		n, _, _ := c.compress(in, out)
+		return n, out[:n], errors.New("libdeflate: native: compressed data is much larger than uncompressed")
 	}
 
 	return n, out[:n], nil
 }
 
 func (c *Compressor) compress(in, out []byte) (int, []byte, error) {
-	inAddr := startMemAddress(in)
-	outAddr := startMemAddress(out)
+	inAddr := startMemAddr(in)
+	outAddr := startMemAddr(out)
 
 	written := int(C.libdeflate_zlib_compress(c.c,
 		unsafe.Pointer(inAddr), intToInt64(len(in)),
