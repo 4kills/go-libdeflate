@@ -6,6 +6,10 @@ import (
 	"testing"
 )
 
+/*---------------------
+		UNIT TESTS
+-----------------------*/
+
 func TestParseResult(t *testing.T) {
 	if err := parseResult(1); err != errorBadData {
 		t.Fail()
@@ -42,3 +46,7 @@ func TestDecompress(t *testing.T) {
 	}
 	slicesEqual([]byte(shortString), out, t)
 }
+
+/*---------------------
+	INTEGRATION TESTS
+-----------------------*/
