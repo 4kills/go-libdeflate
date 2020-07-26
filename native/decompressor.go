@@ -8,11 +8,6 @@ package native
 #include <stdint.h>
 
 typedef struct libdeflate_decompressor decomp;
-typedef enum libdeflate_result res;
-
-size_t* mkPtr(size_t s) {
-	return (size_t*) s;
-}
 */
 import "C"
 import "unsafe"
@@ -88,21 +83,6 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
 	}
 
 	return n, err
-}
-
-func parseResult(r C.res) error {
-	switch r {
-	case C.LIBDEFLATE_SUCCESS:
-		return nil
-	case C.LIBDEFLATE_BAD_DATA:
-		return errorBadData
-	case C.LIBDEFLATE_SHORT_OUTPUT:
-		return errorShortOutput
-	case C.LIBDEFLATE_INSUFFICIENT_SPACE:
-		return errorInsufficientSpace
-	default:
-		return errorUnknown
-	}
 }
 
 // Close frees the memory allocated by C objects
