@@ -5,13 +5,13 @@ package native
 #include "helper.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct libdeflate_decompressor decomp;
 typedef enum libdeflate_result res;
 
-size_t* sizePtr(int fit) {
-	if (fit == 1) return NULL;
-	return (size_t*) malloc(sizeof(size_t));
+size_t* mkPtr(size_t s) {
+	return (size_t*) s;
 }
 */
 import "C"
@@ -20,6 +20,7 @@ import "unsafe"
 // Decompressor decompresses any DEFLATE, zlib or gzip compressed data at any level
 type Decompressor struct {
 	dc *C.decomp
+	isClosed bool
 }
 
 // NewDecompressor returns a new Decompressor or and error if out of memory
@@ -29,7 +30,7 @@ func NewDecompressor() (*Decompressor, error) {
 		return nil, errorOutOfMemory
 	}
 
-	return &Decompressor{dc}, nil
+	return &Decompressor{dc, false}, nil
 }
 
 // Decompress decompresses the given data from in to out and returns out and an error if something went wrong.
@@ -37,6 +38,9 @@ func NewDecompressor() (*Decompressor, error) {
 // If you pass a buffer to out, the size of this buffer must exactly match the length of the decompressed data.
 // If you pass nil as out, this function will allocate a sufficient buffer and return it.
 func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
+	if dc.isClosed {
+		panic(errorAlreadyClosed)
+	}
 	if len(in) == 0 {
 		return out, errorNoInput
 	}
@@ -66,24 +70,22 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
 	inAddr := startMemAddr(in)
 	outAddr := startMemAddr(out)
 
-	f := 0
+	var s int64
+	sPtr := uintptr(unsafe.Pointer(&s))
 	if fit {
-		f = 1
+		sPtr = 0
 	}
-	s := C.sizePtr(C.int(f))
 
-	r := C.libdeflate_zlib_decompress(dc.dc,
+	err := parseResult(C.res(C.libdeflate_zlib_decompress(dc.dc,
 		unsafe.Pointer(inAddr), intToInt64(len(in)),
 		unsafe.Pointer(outAddr), intToInt64(len(out)),
-		s,
-	)
-	err := parseResult(C.res(r))
+		C.mkPtr(C.size_t(sPtr)),
+	)))
 
 	n := len(out)
 	if !fit {
-		n = int(*s)
+		n = int(s)
 	}
-	C.free(unsafe.Pointer(s))
 
 	return n, err
 }
@@ -105,5 +107,9 @@ func parseResult(r C.res) error {
 
 // Close frees the memory allocated by C objects
 func (dc *Decompressor) Close() {
+	if dc.isClosed {
+		panic(errorAlreadyClosed)
+	}
 	C.libdeflate_free_decompressor(dc.dc)
+	dc.isClosed = true
 }
