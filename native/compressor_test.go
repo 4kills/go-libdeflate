@@ -97,7 +97,7 @@ func TestCompressDecompress(t *testing.T) {
 	out := make([]byte, len(shortString))
 	dc, _ := NewDecompressor()
 	defer dc.Close()
-	if _, err := dc.Decompress(comp, out); err != nil {
+	if _, err := dc.Decompress(comp, out, DecompressZlib); err != nil {
 		t.Error(err)
 	}
 	slicesEqual([]byte(shortString), out, t)

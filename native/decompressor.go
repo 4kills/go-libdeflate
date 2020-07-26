@@ -32,7 +32,7 @@ func NewDecompressor() (*Decompressor, error) {
 // If error != nil, then the data in out is undefined.
 // If you pass a buffer to out, the size of this buffer must exactly match the length of the decompressed data.
 // If you pass nil as out, this function will allocate a sufficient buffer and return it.
-func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
+func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error) {
 	if dc.isClosed {
 		panic(errorAlreadyClosed)
 	}
@@ -41,7 +41,7 @@ func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
 	}
 
 	if out != nil {
-		_, err := dc.decompress(in, out, true)
+		_, err := dc.decompress(in, out, true, f)
 		return out, err
 	}
 
@@ -50,7 +50,7 @@ func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
 	err := errorInsufficientSpace
 	for err == errorInsufficientSpace {
 		out = make([]byte, len(in)*inc)
-		n, err = dc.decompress(in, out, false)
+		n, err = dc.decompress(in, out, false, f)
 		if inc >= 16 {
 			inc += 3
 			continue
@@ -61,7 +61,7 @@ func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
 	return out[:n], err
 }
 
-func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
+func (dc *Decompressor) decompress(in, out []byte, fit bool, f decompress) (int, error) {
 	inAddr := startMemAddr(in)
 	outAddr := startMemAddr(out)
 
@@ -71,11 +71,7 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
 		sPtr = 0
 	}
 
-	err := parseResult(C.res(C.libdeflate_zlib_decompress(dc.dc,
-		unsafe.Pointer(inAddr), intToInt64(len(in)),
-		unsafe.Pointer(outAddr), intToInt64(len(out)),
-		C.mkPtr(C.size_t(sPtr)),
-	)))
+	err := f(dc.dc, inAddr, outAddr, len(in), len(out), sPtr)
 
 	n := len(out)
 	if !fit {
