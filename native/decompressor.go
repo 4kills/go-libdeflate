@@ -8,11 +8,6 @@ package native
 #include <stdint.h>
 
 typedef struct libdeflate_decompressor decomp;
-typedef enum libdeflate_result res;
-
-size_t* mkPtr(size_t s) {
-	return (size_t*) s;
-}
 */
 import "C"
 import "unsafe"
@@ -37,7 +32,7 @@ func NewDecompressor() (*Decompressor, error) {
 // If error != nil, then the data in out is undefined.
 // If you pass a buffer to out, the size of this buffer must exactly match the length of the decompressed data.
 // If you pass nil as out, this function will allocate a sufficient buffer and return it.
-func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
+func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error) {
 	if dc.isClosed {
 		panic(errorAlreadyClosed)
 	}
@@ -46,7 +41,7 @@ func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
 	}
 
 	if out != nil {
-		_, err := dc.decompress(in, out, true)
+		_, err := dc.decompress(in, out, true, f)
 		return out, err
 	}
 
@@ -55,7 +50,7 @@ func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
 	err := errorInsufficientSpace
 	for err == errorInsufficientSpace {
 		out = make([]byte, len(in)*inc)
-		n, err = dc.decompress(in, out, false)
+		n, err = dc.decompress(in, out, false, f)
 		if inc >= 16 {
 			inc += 3
 			continue
@@ -66,7 +61,7 @@ func (dc *Decompressor) Decompress(in, out []byte) ([]byte, error) {
 	return out[:n], err
 }
 
-func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
+func (dc *Decompressor) decompress(in, out []byte, fit bool, f decompress) (int, error) {
 	inAddr := startMemAddr(in)
 	outAddr := startMemAddr(out)
 
@@ -76,11 +71,7 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
 		sPtr = 0
 	}
 
-	err := parseResult(C.res(C.libdeflate_zlib_decompress(dc.dc,
-		unsafe.Pointer(inAddr), intToInt64(len(in)),
-		unsafe.Pointer(outAddr), intToInt64(len(out)),
-		C.mkPtr(C.size_t(sPtr)),
-	)))
+	err := f(dc.dc, inAddr, outAddr, len(in), len(out), sPtr)
 
 	n := len(out)
 	if !fit {
@@ -88,21 +79,6 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool) (int, error) {
 	}
 
 	return n, err
-}
-
-func parseResult(r C.res) error {
-	switch r {
-	case C.LIBDEFLATE_SUCCESS:
-		return nil
-	case C.LIBDEFLATE_BAD_DATA:
-		return errorBadData
-	case C.LIBDEFLATE_SHORT_OUTPUT:
-		return errorShortOutput
-	case C.LIBDEFLATE_INSUFFICIENT_SPACE:
-		return errorInsufficientSpace
-	default:
-		return errorUnknown
-	}
 }
 
 // Close frees the memory allocated by C objects

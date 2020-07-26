@@ -41,7 +41,7 @@ func NewCompressor(lvl int) (*Compressor, error) {
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
 // If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
-func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
+func (c *Compressor) Compress(in, out []byte, f compress) (int, []byte, error) {
 	if c.isClosed {
 		panic(errorAlreadyClosed)
 	}
@@ -50,30 +50,27 @@ func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
 	}
 
 	if out != nil {
-		n, b, err := c.compress(in, out)
+		n, b, err := c.compress(in, out, f)
 		return n, b[:n], err
 	}
 
 	out = make([]byte, len(in))
-	n, out, err := c.compress(in, out)
+	n, out, err := c.compress(in, out, f)
 
 	if err == errorShortBuffer { // if still doesn't fit (shouldn't happen at all)
 		out = make([]byte, 1000+len(in)*2)
-		n, _, _ := c.compress(in, out)
+		n, _, _ := c.compress(in, out, f)
 		return n, out[:n], errors.New("libdeflate: native: compressed data is much larger than uncompressed")
 	}
 
 	return n, out[:n], nil
 }
 
-func (c *Compressor) compress(in, out []byte) (int, []byte, error) {
+func (c *Compressor) compress(in, out []byte, f compress) (int, []byte, error) {
 	inAddr := startMemAddr(in)
 	outAddr := startMemAddr(out)
 
-	written := int(C.libdeflate_zlib_compress(c.c,
-		unsafe.Pointer(inAddr), intToInt64(len(in)),
-		unsafe.Pointer(outAddr), intToInt64(len(out)),
-	))
+	written := f(c.c, inAddr, outAddr, len(in), len(out))
 
 	if written == 0 {
 		return written, out, errorShortBuffer
