@@ -8,6 +8,8 @@ typedef struct libdeflate_compressor comp;
 import "C"
 import "unsafe"
 
+type compress func(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int
+
 func CompressZlib(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int {
 	return int(C.libdeflate_zlib_compress(c,
 		unsafe.Pointer(inAddr), intToInt64(inSize),

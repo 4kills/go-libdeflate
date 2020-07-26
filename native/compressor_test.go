@@ -28,7 +28,7 @@ func TestNewCompressor(t *testing.T) {
 func TestCompressMaxComp(t *testing.T) {
 	c, _ := NewCompressor(MaxStdZlibCompressionLevel)
 	defer c.Close()
-	_, comp, err := c.Compress(shortString, nil)
+	_, comp, err := c.Compress(shortString, nil, CompressZlib)
 	if err != nil {
 		t.Error(err)
 	}
@@ -44,7 +44,7 @@ func TestCompressMaxComp(t *testing.T) {
 func TestCompress(t *testing.T) {
 	c, _ := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
-	_, comp, err := c.Compress(shortString, nil)
+	_, comp, err := c.Compress(shortString, nil, CompressZlib)
 	if err != nil {
 		t.Error(err)
 	}
@@ -62,18 +62,18 @@ func TestCompressMeta(t *testing.T) {
 	c, _ := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
 
-	if _, _, err := c.Compress(make([]byte, 0), nil); err == nil {
+	if _, _, err := c.Compress(make([]byte, 0), nil, CompressZlib); err == nil {
 		t.Error("expected error")
 	}
 
-	n, out, err := c.Compress(shortString, nil)
+	n, out, err := c.Compress(shortString, nil, CompressZlib)
 	if err != nil || n == 0 || n >= len(shortString) || n != len(out) {
 		t.Error(err)
 		t.Error(n)
 	}
 
 	out2 := make([]byte, len(shortString))
-	n, _, err = c.Compress(shortString, out2)
+	n, _, err = c.Compress(shortString, out2, CompressZlib)
 	if err != nil || n == 0 {
 		t.Error(err)
 		t.Error(n)
@@ -89,7 +89,7 @@ func TestCompressMeta(t *testing.T) {
 func TestCompressDecompress(t *testing.T) {
 	c, _ := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
-	_, comp, err := c.Compress(shortString, nil)
+	_, comp, err := c.Compress(shortString, nil, CompressZlib)
 	if err != nil {
 		t.Error(err)
 	}
