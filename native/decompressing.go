@@ -15,6 +15,7 @@ import "unsafe"
 
 type decompress func(dc *C.decomp, inAddr, outAddr *byte, inSize, outSize int, sPtr uintptr) error
 
+// DecompressZlib interfaces with c libdeflate for zlib decompression
 func DecompressZlib(dc *C.decomp, inAddr, outAddr *byte, inSize, outSize int, sPtr uintptr) error {
 	return parseResult(C.res(C.libdeflate_zlib_decompress(dc,
 		unsafe.Pointer(inAddr), intToInt64(inSize),
@@ -23,6 +24,7 @@ func DecompressZlib(dc *C.decomp, inAddr, outAddr *byte, inSize, outSize int, sP
 	)))
 }
 
+// DecompressDEFLATE interfaces with c libdeflate for DEFLATE decompression
 func DecompressDEFLATE(dc *C.decomp, inAddr, outAddr *byte, inSize, outSize int, sPtr uintptr) error {
 	return parseResult(C.res(C.libdeflate_deflate_decompress(dc,
 		unsafe.Pointer(inAddr), intToInt64(inSize),
@@ -31,6 +33,7 @@ func DecompressDEFLATE(dc *C.decomp, inAddr, outAddr *byte, inSize, outSize int,
 	)))
 }
 
+// DecompressGzip interfaces with c libdeflate for gzip decompression
 func DecompressGzip(dc *C.decomp, inAddr, outAddr *byte, inSize, outSize int, sPtr uintptr) error {
 	return parseResult(C.res(C.libdeflate_gzip_decompress(dc,
 		unsafe.Pointer(inAddr), intToInt64(inSize),

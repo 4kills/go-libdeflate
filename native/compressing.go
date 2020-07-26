@@ -10,6 +10,7 @@ import "unsafe"
 
 type compress func(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int
 
+// CompressZlib interfaces with c libdeflate for zlib compression
 func CompressZlib(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int {
 	return int(C.libdeflate_zlib_compress(c,
 		unsafe.Pointer(inAddr), intToInt64(inSize),
@@ -17,6 +18,7 @@ func CompressZlib(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int {
 	))
 }
 
+// CompressDEFLATE interfaces with c libdeflate for DEFLATE compression
 func CompressDEFLATE(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int {
 	return int(C.libdeflate_deflate_compress(c,
 		unsafe.Pointer(inAddr), intToInt64(inSize),
@@ -24,6 +26,7 @@ func CompressDEFLATE(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int 
 	))
 }
 
+// CompressGzip interfaces with c libdeflate for gzip compression
 func CompressGzip(c *C.comp, inAddr, outAddr *byte, inSize, outSize int) int {
 	return int(C.libdeflate_gzip_compress(c,
 		unsafe.Pointer(inAddr), intToInt64(inSize),
