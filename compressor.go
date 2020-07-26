@@ -6,6 +6,8 @@ import "github.com/4kills/libdeflate/native"
 //
 // A single compressor must not not be used across multiple threads concurrently.
 // If you want to compress concurrently, create a compressor for each thread.
+//
+// Always Close() the decompressor to free c memory.
 type Compressor struct {
 	c *native.Compressor
 	lvl int
