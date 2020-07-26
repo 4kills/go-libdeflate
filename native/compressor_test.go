@@ -13,7 +13,7 @@ var shortString = []byte("hello, world\nhello, world\nhello, world\nhello, world
 -----------------------*/
 
 func TestNewCompressor(t *testing.T) {
-	c, err := NewCompressor(defaultLevel)
+	c, err := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
 	if err != nil {
 		t.Error(err)
@@ -26,7 +26,7 @@ func TestNewCompressor(t *testing.T) {
 }
 
 func TestCompressMaxComp(t *testing.T) {
-	c, _ := NewCompressor(maxStdZlibLevel)
+	c, _ := NewCompressor(MaxStdZlibCompressionLevel)
 	defer c.Close()
 	_, comp, err := c.Compress(shortString, nil)
 	if err != nil {
@@ -42,7 +42,7 @@ func TestCompressMaxComp(t *testing.T) {
 }
 
 func TestCompress(t *testing.T) {
-	c, _ := NewCompressor(defaultLevel)
+	c, _ := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
 	_, comp, err := c.Compress(shortString, nil)
 	if err != nil {
@@ -59,7 +59,7 @@ func TestCompress(t *testing.T) {
 
 // this test doesn't really say as much as TestCompress
 func TestCompressMeta(t *testing.T) {
-	c, _ := NewCompressor(defaultLevel)
+	c, _ := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
 
 	if _, _, err := c.Compress(make([]byte, 0), nil); err == nil {
@@ -87,7 +87,7 @@ func TestCompressMeta(t *testing.T) {
 -----------------------*/
 
 func TestCompressDecompress(t *testing.T) {
-	c, _ := NewCompressor(defaultLevel)
+	c, _ := NewCompressor(DefaultCompressionLevel)
 	defer c.Close()
 	_, comp, err := c.Compress(shortString, nil)
 	if err != nil {
