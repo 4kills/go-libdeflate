@@ -46,7 +46,3 @@ func TestDecompress(t *testing.T) {
 	}
 	slicesEqual([]byte(shortString), out, t)
 }
-
-/*---------------------
-	INTEGRATION TESTS
------------------------*/
