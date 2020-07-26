@@ -53,8 +53,8 @@ func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
 }
 
 func (c *Compressor) compress(in, out []byte) (int, []byte, error) {
-	inAddr := startMemAddress(in)
-	outAddr := startMemAddress(out)
+	inAddr := startMemAddr(in)
+	outAddr := startMemAddr(out)
 
 	written := int(C.libdeflate_zlib_compress(c.c,
 		unsafe.Pointer(inAddr), intToInt64(len(in)),
