@@ -10,6 +10,7 @@ var (
 	errorBadData      = errors.New("libdeflate: native: bad data: data was corrupted, invalid or unsupported")
 	errorUnknown      = errors.New("libdeflate: native: unknown error code from c library")
 	errorShortOutput  = errors.New("libdeflate: native: buffer too long: decompressed to fewer bytes than expected, indicating possible error in decompression. Make sure your out buffer has the exact length of the decompressed data or pass nil for out")
+	errorAlreadyClosed = errors.New("libdeflate: native: (de-)compressor already closed. It must not be used anymore")
 
 	// checked error (in native)
 	errorInsufficientSpace = errors.New("libdeflate: native: buffer too short. Retry with larger buffer")

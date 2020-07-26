@@ -15,6 +15,7 @@ import (
 // Compressor compresses data to zlib format at the specified level
 type Compressor struct {
 	c   *C.comp
+	isClosed bool
 	lvl int
 }
 
@@ -30,7 +31,7 @@ func NewCompressor(lvl int) (*Compressor, error) {
 		return nil, errorOutOfMemory
 	}
 
-	return &Compressor{c, lvl}, nil
+	return &Compressor{c, false, lvl}, nil
 }
 
 // Compress compresses the data from in to out and returns the number
@@ -41,6 +42,9 @@ func NewCompressor(lvl int) (*Compressor, error) {
 // the compressed data could be larger than uncompressed.
 // If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
 func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
+	if c.isClosed {
+		panic(errorAlreadyClosed)
+	}
 	if len(in) == 0 {
 		return 0, out, errorNoInput
 	}
@@ -79,5 +83,9 @@ func (c *Compressor) compress(in, out []byte) (int, []byte, error) {
 
 // Close frees the memory allocated by C objects
 func (c *Compressor) Close() {
+	if c.isClosed {
+		panic(errorAlreadyClosed)
+	}
 	C.libdeflate_free_compressor(c.c)
+	c.isClosed = true
 }
