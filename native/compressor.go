@@ -46,7 +46,8 @@ func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
 	}
 
 	if out != nil {
-		return c.compress(in, out)
+		n, b, err := c.compress(in, out)
+		return n, b[:n], err
 	}
 
 	out = make([]byte, len(in))
