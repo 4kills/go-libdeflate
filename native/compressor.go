@@ -7,7 +7,10 @@ package native
 typedef struct libdeflate_compressor comp;
 */
 import "C"
-import "unsafe"
+import (
+	"errors"
+	"unsafe"
+)
 
 // Compressor compresses data to zlib format at the specified level
 type Compressor struct {
@@ -33,6 +36,10 @@ func NewCompressor(lvl int) (*Compressor, error) {
 // Compress compresses the data from in to out and returns the number
 // of bytes written to out, out and an error if the out buffer was too short.
 // If you pass nil for out, this function will allocate a fitting buffer and return it.
+//
+// Notice that for extremely small or already highly compressed data,
+// the compressed data could be larger than uncompressed.
+// If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
 func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
 	if len(in) == 0 {
 		return 0, out, errorNoInput
@@ -44,9 +51,11 @@ func (c *Compressor) Compress(in, out []byte) (int, []byte, error) {
 
 	out = make([]byte, len(in))
 	n, out, err := c.compress(in, out)
-	if err != nil {
-		copy(out, in)
-		return len(in), out[:len(in)], nil
+
+	if err == errorShortBuffer { // if still doesn't fit (shouldn't happen at all)
+		out = make([]byte, 1000+len(in)*2)
+		n, _, _ := c.compress(in, out)
+		return n, out[:n], errors.New("libdeflate: native: compressed data is much larger than uncompressed")
 	}
 
 	return n, out[:n], nil
