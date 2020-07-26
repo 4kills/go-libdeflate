@@ -1,6 +1,10 @@
 package native
 
-import "testing"
+import (
+	"bytes"
+	"compress/zlib"
+	"testing"
+)
 
 var shortString = []byte("hello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\nhello, world\n")
 
@@ -17,8 +21,40 @@ func TestNewCompressor(t *testing.T) {
 	}
 }
 
-// this test doesn't really say much - integration tests will show correctnes
+func TestCompressMaxComp(t *testing.T) {
+	c, _ := NewCompressor(maxStdZlibLevel)
+	defer c.Close()
+	_, comp, err := c.Compress(shortString, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r, _ := zlib.NewReader(bytes.NewBuffer(comp))
+	defer r.Close()
+	decomp := make([]byte, len(shortString))
+	r.Read(decomp)
+
+	slicesEqual([]byte(shortString), decomp, t)
+}
+
 func TestCompress(t *testing.T) {
+	c, _ := NewCompressor(defaultLevel)
+	defer c.Close()
+	_, comp, err := c.Compress(shortString, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r, _ := zlib.NewReader(bytes.NewBuffer(comp))
+	defer r.Close()
+	decomp := make([]byte, len(shortString))
+	r.Read(decomp)
+
+	slicesEqual([]byte(shortString), decomp, t)
+}
+
+// this test doesn't really say as much as TestCompress
+func TestCompressMeta(t *testing.T) {
 	c, _ := NewCompressor(defaultLevel)
 	defer c.Close()
 
