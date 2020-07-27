@@ -1,4 +1,4 @@
-package native
+package libdeflate
 
 import (
 	"bytes"
@@ -13,22 +13,22 @@ var shortString = []byte("hello, world\nhello, world\nhello, world\nhello, world
 -----------------------*/
 
 func TestNewCompressor(t *testing.T) {
-	c, err := NewCompressor(DefaultCompressionLevel)
+	c, err := NewCompressor()
 	if err != nil {
 		t.Error(err)
 	}
 	defer c.Close()
 
-	c, err = NewCompressor(30)
+	c, err = NewCompressorLevel(30)
 	if err == nil {
 		t.Fail()
 	}
 }
 
 func TestCompressMaxComp(t *testing.T) {
-	c, _ := NewCompressor(MaxStdZlibCompressionLevel)
+	c, _ := NewCompressorLevel(MaxStdZlibCompressionLevel)
 	defer c.Close()
-	_, comp, err := c.Compress(shortString, nil, CompressZlib)
+	_, comp, err := c.CompressZlib(shortString, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -38,13 +38,13 @@ func TestCompressMaxComp(t *testing.T) {
 	decomp := make([]byte, len(shortString))
 	r.Read(decomp)
 
-	slicesEqual([]byte(shortString), decomp, t)
+	slicesEqual(shortString, decomp, t)
 }
 
 func TestCompress(t *testing.T) {
-	c, _ := NewCompressor(DefaultCompressionLevel)
+	c, _ := NewCompressor()
 	defer c.Close()
-	_, comp, err := c.Compress(shortString, nil, CompressZlib)
+	_, comp, err := c.CompressZlib(shortString, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -59,21 +59,21 @@ func TestCompress(t *testing.T) {
 
 // this test doesn't really say as much as TestCompress
 func TestCompressMeta(t *testing.T) {
-	c, _ := NewCompressor(DefaultCompressionLevel)
+	c, _ := NewCompressor()
 	defer c.Close()
 
-	if _, _, err := c.Compress(make([]byte, 0), nil, CompressZlib); err == nil {
+	if _, _, err := c.CompressZlib(make([]byte, 0), nil); err == nil {
 		t.Error("expected error")
 	}
 
-	n, out, err := c.Compress(shortString, nil, CompressZlib)
+	n, out, err := c.CompressZlib(shortString, nil)
 	if err != nil || n == 0 || n >= len(shortString) || n != len(out) {
 		t.Error(err)
 		t.Error(n)
 	}
 
 	out2 := make([]byte, len(shortString))
-	n, _, err = c.Compress(shortString, out2, CompressZlib)
+	n, _, err = c.CompressZlib(shortString, out2)
 	if err != nil || n == 0 {
 		t.Error(err)
 		t.Error(n)
@@ -87,9 +87,9 @@ func TestCompressMeta(t *testing.T) {
 -----------------------*/
 
 func TestCompressDecompress(t *testing.T) {
-	c, _ := NewCompressor(DefaultCompressionLevel)
+	c, _ := NewCompressor()
 	defer c.Close()
-	_, comp, err := c.Compress(shortString, nil, CompressZlib)
+	_, comp, err := c.CompressZlib(shortString, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,7 +97,7 @@ func TestCompressDecompress(t *testing.T) {
 	out := make([]byte, len(shortString))
 	dc, _ := NewDecompressor()
 	defer dc.Close()
-	if _, err := dc.Decompress(comp, out, DecompressZlib); err != nil {
+	if _, err := dc.DecompressZlib(comp, out); err != nil {
 		t.Error(err)
 	}
 	slicesEqual([]byte(shortString), out, t)
