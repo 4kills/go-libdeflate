@@ -25,7 +25,17 @@ func TestNewCompressor(t *testing.T) {
 	}
 }
 
-func TestCompressMaxComp(t *testing.T) {
+func TestCompressGzip(t *testing.T) {
+	c, _ := NewCompressor()
+	defer c.Close()
+
+	_, comp, err := c.Compress(shortString, nil, ModeGzip)
+
+	b := bytes.NewBuffer(comp)
+
+}
+
+func TestCompressZlibMaxComp(t *testing.T) {
 	c, _ := NewCompressorLevel(MaxStdZlibCompressionLevel)
 	defer c.Close()
 	_, comp, err := c.CompressZlib(shortString, nil)
@@ -41,7 +51,7 @@ func TestCompressMaxComp(t *testing.T) {
 	slicesEqual(shortString, decomp, t)
 }
 
-func TestCompress(t *testing.T) {
+func TestCompressZlib(t *testing.T) {
 	c, _ := NewCompressor()
 	defer c.Close()
 	_, comp, err := c.CompressZlib(shortString, nil)
