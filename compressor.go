@@ -32,7 +32,7 @@ func NewCompressorLevel(level int) (Compressor, error) {
 
 // CompressZlib compresses the data from in to out (in zlib format) and returns the number
 // of bytes written to out, out (sliced to written) or an error if the out buffer was too short.
-// If you pass nil for out, this function will allocate a fitting buffer and return it (not preferred though). o
+// If you pass nil for out, this function will allocate a fitting buffer and return it (not preferred though).
 //
 // See c.Compress for further information.
 func (c Compressor) CompressZlib(in, out []byte) (int, []byte, error) {
