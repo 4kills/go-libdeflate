@@ -15,7 +15,7 @@ import (
 func TestDecompressDEFLATE(t *testing.T) {
 	// compress with go standard lib
 	buf := &bytes.Buffer{}
-	w := flate.NewWriter(buf)
+	w, _ := flate.NewWriter(buf, flate.DefaultCompression)
 	w.Write([]byte(shortString))
 	w.Close()
 	in := buf.Bytes()

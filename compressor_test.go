@@ -38,10 +38,7 @@ func TestCompressDEFLATE(t *testing.T) {
 	}
 
 	b := bytes.NewBuffer(comp)
-	r, err := flate.NewReader(b)
-	if err != nil {
-		t.Error(err)
-	}
+	r := flate.NewReader(b)
 	defer r.Close()
 
 	dc := &bytes.Buffer{}
