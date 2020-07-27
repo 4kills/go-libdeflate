@@ -21,13 +21,7 @@ func CompressZlib(in, out []byte) (int, []byte, error) {
 //
 // See CompressLevel for further information.
 func CompressZlibLevel(in, out []byte, level int) (int, []byte, error) {
-	c, err := NewCompressorLevel(level)
-	if err != nil {
-		return 0, out, err
-	}
-	defer c.Close()
-
-	return c.CompressZlib(in, out)
+	return CompressLevel(in, out, ModeZlib, level)
 }
 
 // Compress compresses the data from in to out and returns the number
