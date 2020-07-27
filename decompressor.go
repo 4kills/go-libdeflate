@@ -19,7 +19,7 @@ func NewDecompressor() (Decompressor, error) {
 	return Decompressor{dc}, err
 }
 
-// Decompress decompresses the given zlib data from in to out and returns out or an error if something went wrong.
+// DecompressZlib decompresses the given zlib data from in to out and returns out or an error if something went wrong.
 //
 // If you pass a buffer to out, the size of this buffer must exactly match the length of the decompressed data.
 // If you pass nil to out, this function will allocate a sufficient buffer and return it.

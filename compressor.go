@@ -9,7 +9,7 @@ import "github.com/4kills/libdeflate/native"
 //
 // Always Close() the decompressor to free c memory.
 type Compressor struct {
-	c *native.Compressor
+	c   *native.Compressor
 	lvl int
 }
 
@@ -20,7 +20,7 @@ func NewCompressor() (Compressor, error) {
 	return NewCompressorLevel(DefaultCompressionLevel)
 }
 
-// NewCompressor returns a new Compressor used to compress data.
+// NewCompressorLevel returns a new Compressor used to compress data.
 // Errors if out of memory or if an invalid compression level was passed.
 //
 // The compression level is legal if and only if:
@@ -50,10 +50,14 @@ func (c Compressor) CompressZlib(in, out []byte) (int, []byte, error) {
 // If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
 func (c Compressor) Compress(in, out []byte, m Mode) (int, []byte, error) {
 	switch m {
-	case ModeZlib: return c.c.Compress(in, out, native.CompressZlib)
-	case ModeDEFLATE: return c.c.Compress(in, out, native.CompressDEFLATE)
-	case ModeGzip: return c.c.Compress(in, out, native.CompressGzip)
-	default: panic("libdeflate: compress: invalid mode")
+	case ModeZlib:
+		return c.c.Compress(in, out, native.CompressZlib)
+	case ModeDEFLATE:
+		return c.c.Compress(in, out, native.CompressDEFLATE)
+	case ModeGzip:
+		return c.c.Compress(in, out, native.CompressGzip)
+	default:
+		panic("libdeflate: compress: invalid mode")
 	}
 }
 

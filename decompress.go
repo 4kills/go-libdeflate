@@ -1,6 +1,6 @@
 package libdeflate
 
-// Decompress decompresses the given data from in (zlib formatted) to out and returns out
+// DecompressZlib decompresses the given data from in (zlib formatted) to out and returns out
 // or an error if something went wrong.
 //
 // If you pass a buffer to out, the size of this buffer must exactly match the length of the decompressed data.
