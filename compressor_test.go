@@ -2,7 +2,10 @@ package libdeflate
 
 import (
 	"bytes"
+	"compress/flate"
+	"compress/gzip"
 	"compress/zlib"
+	"io"
 	"testing"
 )
 
@@ -25,14 +28,48 @@ func TestNewCompressor(t *testing.T) {
 	}
 }
 
+func TestCompressDEFLATE(t *testing.T) {
+	c, _ := NewCompressor()
+	defer c.Close()
+
+	_, comp, err := c.Compress(shortString, nil, ModeDEFLATE)
+	if err != nil {
+		t.Error(err)
+	}
+
+	b := bytes.NewBuffer(comp)
+	r, err := flate.NewReader(b)
+	if err != nil {
+		t.Error(err)
+	}
+	defer r.Close()
+
+	dc := &bytes.Buffer{}
+	io.Copy(dc, r)
+
+	slicesEqual(shortString, dc.Bytes(), t)
+}
+
 func TestCompressGzip(t *testing.T) {
 	c, _ := NewCompressor()
 	defer c.Close()
 
 	_, comp, err := c.Compress(shortString, nil, ModeGzip)
+	if err != nil {
+		t.Error(err)
+	}
 
 	b := bytes.NewBuffer(comp)
+	r, err := gzip.NewReader(b)
+	if err != nil {
+		t.Error(err)
+	}
+	defer r.Close()
 
+	dc := &bytes.Buffer{}
+	io.Copy(dc, r)
+
+	slicesEqual(shortString, dc.Bytes(), t)
 }
 
 func TestCompressZlibMaxComp(t *testing.T) {
