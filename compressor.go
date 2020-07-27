@@ -8,13 +8,14 @@ import "github.com/4kills/libdeflate/native"
 // If you want to compress concurrently, create a compressor for each thread.
 //
 // Always Close() the decompressor to free c memory.
+// One Compressor allocates at least 32 KiB.
 type Compressor struct {
 	c   *native.Compressor
 	lvl int
 }
 
 // NewCompressor returns a new Compressor used to compress data with compression level DefaultCompressionLevel.
-// Errors if out of memory.
+// Errors if out of memory. Allocates 32KiB.
 // See NewCompressorLevel for custom compression level
 func NewCompressor() (Compressor, error) {
 	return NewCompressorLevel(DefaultCompressionLevel)
@@ -22,6 +23,7 @@ func NewCompressor() (Compressor, error) {
 
 // NewCompressorLevel returns a new Compressor used to compress data.
 // Errors if out of memory or if an invalid compression level was passed.
+// Allocates 32KiB.
 //
 // The compression level is legal if and only if:
 // MinCompressionLevel <= level <= MaxCompressionLevel

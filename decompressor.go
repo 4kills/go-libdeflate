@@ -8,12 +8,13 @@ import "github.com/4kills/libdeflate/native"
 // If you want to decompress concurrently, create a decompressor for each thread.
 //
 // Always Close() the decompressor to free c memory.
+// One Decompressor allocates at least 32KiB.
 type Decompressor struct {
 	dc *native.Decompressor
 }
 
 // NewDecompressor returns a new Decompressor used to decompress data at any compression level and with any Mode.
-// Errors if out of memory.
+// Errors if out of memory. Allocates 32KiB.
 func NewDecompressor() (Decompressor, error) {
 	dc, err := native.NewDecompressor()
 	return Decompressor{dc}, err

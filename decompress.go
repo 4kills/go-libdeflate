@@ -7,7 +7,7 @@ package libdeflate
 // If you pass nil to out, this function will allocate a sufficient buffer and return it.
 //
 // IF YOU WANT TO DECOMPRESS MORE THAN ONCE, PLEASE REFER TO NewDecompressor(),
-// as this function creates a new Decompressor which is then closed at the end of the function.
+// as this function creates a new Decompressor (alloc 32KiB) which is then closed at the end of the function.
 //
 // If error != nil, the data in out is undefined.
 func DecompressZlib(in, out []byte) ([]byte, error) {
@@ -21,7 +21,7 @@ func DecompressZlib(in, out []byte) ([]byte, error) {
 // If you pass nil to out, this function will allocate a sufficient buffer and return it.
 //
 // IF YOU WANT TO DECOMPRESS MORE THAN ONCE, PLEASE REFER TO NewDecompressor(),
-// as this function creates a new Decompressor which is then closed at the end of the function.
+// as this function creates a new Decompressor (alloc 32KiB) which is then closed at the end of the function.
 //
 // If error != nil, the data in out is undefined.
 func Decompress(in, out []byte, m Mode) ([]byte, error) {

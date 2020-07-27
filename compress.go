@@ -5,7 +5,7 @@ package libdeflate
 // If you pass nil for out, this function will allocate a fitting buffer and return it (not preferred though).
 //
 // IF YOU WANT TO COMPRESS MORE THAN ONCE, PLEASE REFER TO NewCompressor(),
-// as this function creates a new Compressor which is then closed at the end of the function.
+// as this function creates a new Compressor (alloc 32KiB) which is then closed at the end of the function.
 //
 // See Compress for further information.
 func CompressZlib(in, out []byte) (int, []byte, error) {
@@ -17,7 +17,7 @@ func CompressZlib(in, out []byte) (int, []byte, error) {
 // If you pass nil for out, this function will allocate a fitting buffer and return it (not preferred though).
 //
 // IF YOU WANT TO COMPRESS MORE THAN ONCE, PLEASE REFER TO NewCompressorLevel(),
-// as this function creates a new Compressor which is then closed at the end of the function.
+// as this function creates a new Compressor (alloc 32KiB) which is then closed at the end of the function.
 //
 // See CompressLevel for further information.
 func CompressZlibLevel(in, out []byte, level int) (int, []byte, error) {
@@ -31,7 +31,7 @@ func CompressZlibLevel(in, out []byte, level int) (int, []byte, error) {
 // m specifies which compression format should be used (e.g. ModeZlib). Uses default compression level.
 //
 // IF YOU WANT TO COMPRESS MORE THAN ONCE, PLEASE REFER TO NewCompressor(),
-// as this function creates a new Compressor which is then closed at the end of the function.
+// as this function creates a new Compressor (alloc 32KiB) which is then closed at the end of the function.
 //
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
@@ -48,7 +48,7 @@ func Compress(in, out []byte, m Mode) (int, []byte, error) {
 // Level defines the compression level.
 //
 // IF YOU WANT TO COMPRESS MORE THAN ONCE, PLEASE REFER TO NewCompressorLevel(),
-// as this function creates a new Compressor which is then closed at the end of the function.
+// as this function creates a new Compressor (alloc 32KiB) which is then closed at the end of the function.
 //
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
@@ -62,4 +62,3 @@ func CompressLevel(in, out []byte, m Mode, level int) (int, []byte, error) {
 
 	return c.Compress(in, out, m)
 }
-
