@@ -4,7 +4,7 @@
 
 This library wraps the [libdeflate](https://github.com/ebiggers/libdeflate) zlib-, gzip- and deflate-(de)compression library for golang, using cgo.
 
-It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream *large* data. Therefore, this library is optimal for the special use case of (de)compressing whole-buffered in-memory data, such as small packets in the size range of a few hundred bytes to several hundred megabytes.
+It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data. Therefore, this library is optimal for the special use case of (de)compressing whole-buffered in-memory data: If it fits into your RAM, this library can (de)compress it much faster than the standard libraries can. 
 
 ## Table of Contents
 
