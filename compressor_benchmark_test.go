@@ -36,12 +36,24 @@ func BenchmarkCompressZlibAllMcPacketsFastestStdLib(b *testing.B) {
 	compressZlibAllMcPacketsStdLibLevel(MinCompressionLevel, b)
 }
 
+func BenchmarkCompressZlib1McPacketLibdeflate(b *testing.B) {
+	compressZlib1McPacketLibdeflateLevel(DefaultCompressionLevel, b)
+}
+
+func BenchmarkCompressZlib1McPacketStdLib(b *testing.B) {
+	compressZlib1McPacketStdLibLevel(DefaultCompressionLevel, b)
+}
+
+//-----------------------------------------------------------------
+
 func compressZlibAllMcPacketsLibdeflateLevel(level int, b *testing.B) {
 	loadPacketsIfNil(&decompressedMcPackets, decompressedMcPacketsLoc)
 	c, _ := NewCompressorLevel(level)
 	defer c.Close()
 
 	b.ResetTimer()
+
+	reportBytesPerIteration(decompressedMcPackets, b)
 
 	for i := 0; i < b.N; i++ {
 		for _, v := range decompressedMcPackets {
@@ -63,6 +75,8 @@ func compressZlibAllMcPacketsStdLibLevel(level int, b *testing.B) {
 
 	b.ResetTimer()
 
+	reportBytesPerIteration(decompressedMcPackets, b)
+
 	for i := 0; i < b.N; i++ {
 		for _, v := range decompressedMcPackets {
 			b.StopTimer()
@@ -78,17 +92,57 @@ func compressZlibAllMcPacketsStdLibLevel(level int, b *testing.B) {
 	}
 }
 
+func compressZlib1McPacketLibdeflateLevel(level int, b *testing.B) {
+	loadPacketsIfNil(&decompressedMcPackets, decompressedMcPacketsLoc)
+	c, _ := NewCompressorLevel(level)
+	defer c.Close()
+	out := make([]byte, len(decompressedMcPackets[1]))
+
+	b.ResetTimer()
+
+	reportBytesPerIteration(decompressedMcPackets[1:2], b)
+
+	for i := 0; i < b.N; i++ {
+		n, _, _ := c.CompressZlib(decompressedMcPackets[1], out)
+
+		b.ReportMetric(float64(len(decompressedMcPackets[1]))/float64(n), "ratio")
+	}
+}
+
+func compressZlib1McPacketStdLibLevel(level int, b *testing.B) {
+	loadPacketsIfNil(&decompressedMcPackets, decompressedMcPacketsLoc)
+	w, _ := zlib.NewWriterLevel(&bytes.Buffer{}, level)
+	defer w.Close()
+	out := make([]byte, 0, len(decompressedMcPackets[1]))
+
+	b.ResetTimer()
+
+	reportBytesPerIteration(decompressedMcPackets[1:2], b)
+
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		buf := bytes.NewBuffer(out)
+		w.Reset(buf)
+		b.StartTimer()
+
+		w.Write(decompressedMcPackets[1])
+		w.Flush() // has to be called too, because this lib's compressor always flushes
+
+		b.ReportMetric(float64(len(decompressedMcPackets[1]))/float64(buf.Len()), "ratio")
+	}
+}
+
 /*---------------------
 		HELPER
 -----------------------*/
 
-func reportBytesPerChunk(input [][]byte, b *testing.B) {
+func reportBytesPerIteration(input [][]byte, b *testing.B) {
 	b.StopTimer()
 	numOfBytes := 0
 	for _, v := range input {
 		numOfBytes += len(v)
 	}
-	b.ReportMetric(float64(numOfBytes), "bytes/chunk")
+	b.ReportMetric(float64(numOfBytes), "bytes_processed/op")
 	b.StartTimer()
 }
 
