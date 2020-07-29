@@ -16,6 +16,12 @@ It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libr
 - [Usage](#usage)
   - [Compress](#compress)
   - [Decompress](#decompress)
+- [Notes](#notes)
+- [Benchmarks](#benchmarks)
+  - [Compression](#compression)
+  - [Decompression](#decompression)
+- [License](#license)
+- [Attribution](#attribution)
 
 # Features
 
@@ -173,3 +179,21 @@ dc.Close()
 ```
 
 There are also convencience methods that allow one-time compression to be more easy as well as directly compress to zlib format.
+
+# Notes
+
+- **Do NOT use the <ins>same</ins> Compressor / Decompressor across multiple threads <ins>simultaneously</ins>.** However, you can create as many of them as you like, so if you want to parallelize your application, just create a compressor / decompressor for each thread. (See Memory Usage down below for more inof)
+
+- **Always `Close()` your Compressor / Decompressor when you are done with it** - especially if you create a new compressor/decompressor for each compression/decompression you undertake (which is generally discouraged anyway). As the C-part of this library is not subject to the go garbage collector, the memory allocated by it must be released manually (by a call to `Close()`) to avoid memory leakage.
+
+- Memory Usage: `Compressing` requires at least ~32KiB of additional memory during execution, while `Decompressing` also requires at least ~32 KiB of additional memory during execution. 
+
+# Benchmarks
+
+## Compression
+
+## Decompression
+
+# License
+
+# Attribution
