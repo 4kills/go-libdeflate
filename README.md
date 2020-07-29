@@ -9,7 +9,7 @@ It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libr
 ## Table of Contents
 
 - [Features](#features)
-  - [Completeness of the go Wrapper](#availability-of-the-original-libdeflate-api  
+  - [Completeness of the go Wrapper](#availability-of-the-original-libdeflate-api)
 - [Installation](#installation)
   - [Prerequisites (cgo)](#prerequisites-working-cgo)
   - [Download and Installation](#download-and-installation)
@@ -154,7 +154,7 @@ dc, err := libdeflate.NewDecompressor()
 Then you can decompress the actual data with a given mode of compression (currently supported: zlib, gzip, raw deflate): 
 
 ```go 
-decompressed := make([]byte, len(decomp)) 
+decompressed := make([]byte, len(decomp)) // must be exactly the size of the output, if unknown, pass nil for out(see below)
 
 _, err = dc.Decompress(comp, decompressed, ModeZlib) 
 ```
