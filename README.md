@@ -154,7 +154,8 @@ dc, err := libdeflate.NewDecompressor()
 Then you can decompress the actual data with a given mode of compression (currently supported: zlib, gzip, raw deflate): 
 
 ```go 
-decompressed := make([]byte, len(decomp)) // must be exactly the size of the output, if unknown, pass nil for out(see below)
+// must be exactly the size of the output, if unknown, pass nil for out(see below)
+decompressed := make([]byte, len(decomp)) 
 
 _, err = dc.Decompress(comp, decompressed, ModeZlib) 
 ```
