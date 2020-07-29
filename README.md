@@ -9,11 +9,13 @@ It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libr
 ## Table of Contents
 
 - [Features](#features)
-  - [Completeness of the go Wrapper](#availability-of-the-original-libdeflate-api)
-  
+  - [Completeness of the go Wrapper](#availability-of-the-original-libdeflate-api  
 - [Installation](#installation)
   - [Prerequisites (cgo)](#prerequisites-working-cgo)
   - [Download and Installation](#download-and-installation)
+- [Usage](#usage)
+  - [Compress](#compress)
+  - [Decompress](#decompress)
 
 # Features
 
@@ -98,3 +100,75 @@ import "C"
 That's it! It should work now!
 
 </details>
+
+# Usage
+
+## Compress
+
+First, you need to create a compressor that can be used for any type of compression. 
+
+You can also specify a level of compression for which holds true: The higher the level, the higher the compression at the expense of speed. 
+`-> lower level = fast, bad compression; higher level = slow, good compression`. Test what works best for your application but generally the `DefaultCompressionLevel` is fine most of the time. 
+
+```go
+// Compressor with default compression level. Errors if out of memory
+c, err := libdeflate.NewCompressor()
+
+// Compressor with custom compression level. Errors if out of memory or if an illegal level was passed. 
+c, err = libdeflate.NewCompressorLevel(2)
+```
+
+Then you can compress the actual data with a given mode of compression (currently supported: zlib, gzip, raw deflate): 
+
+```go 
+decomp := []byte(`Some data to compress: May be anything,  
+    but it might be a good idea to only compress data that exceeds a certain threshold in size, 
+    as compressed data can become larger (due to overhead)`)
+comp := make([]byte, len(decomp)) // supplying a fitting buffer is in all cases the fastest approach
+
+n, _, err := c.Compress(decomp, comp, libdeflate.ModeZlib) // Errors if buffer was too short
+comp = comp[:n]
+```
+
+You can also pass nil for out and the function will allocate a fitting buffer by itself:
+
+```go
+_, comp, err = c.Compress(decomp, nil, libdeflate.ModeZlib)
+```
+
+After you are done with the compressor, do not forget to close it to free c-allocated-memory:
+
+```go
+c.Close()
+```
+
+## Decompress 
+
+As with compression, you need to create a decompressor which can also be used for any type of decompression at any compression level:
+
+```go
+// Doesn't need a compression level; works universally. Errors if out of memory.
+dc, err := libdeflate.NewDecompressor() 
+```
+
+Then you can decompress the actual data with a given mode of compression (currently supported: zlib, gzip, raw deflate): 
+
+```go 
+decompressed := make([]byte, len(decomp)) 
+
+_, err = dc.Decompress(comp, decompressed, ModeZlib) 
+```
+
+Just like with compress you can also pass nil and get a fitting buffer:
+
+```go
+decompressed, err = dc.Decompress(comp, nil, ModeZlib)
+```
+
+After you are done with the decompressor, do not forget to close it to free c-allocated-memory:
+
+```go
+dc.Close()
+```
+
+There are also convencience methods that allow one-time compression to be more easy as well as directly compress to zlib format.
