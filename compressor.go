@@ -72,19 +72,19 @@ func (c Compressor) Level() int {
 /*
 WorstCaseCompressedSize returns the maximum theoretical size of the data after compressing data of length 'size',
 using the given mode of compression.
-This prediction is a wild overestimate in most cases.
+This prediction is a wild overestimate in most cases, for which holds true: max >= size. 
 However, it gives a hard maximal bound of the size of compressed data, compressing with the given mode
 at the compression level of the this compressor, independent of the actual data.
-This method will always return the same max size for the same compressor, input size and mode. 
+This method will always return the same max size for the same compressor, input size and mode.
  */
-func (c Compressor) WorstCaseCompressedSize(size int, m Mode) int {
+func (c Compressor) WorstCaseCompressedSize(size int, m Mode) (max int) {
 	switch m {
 	case ModeDEFLATE:
-		c.c.UpperBound(size, native.DeflateBound)
+		return c.c.UpperBound(size, native.DeflateBound)
 	case ModeZlib:
-		c.c.UpperBound(size, native.ZlibBound)
+		return c.c.UpperBound(size, native.ZlibBound)
 	case ModeGzip:
-		c.c.UpperBound(size, native.GzipBound)
+		return c.c.UpperBound(size, native.GzipBound)
 	default:
 		panic("libdeflate: compress: invalid mode")
 	}
