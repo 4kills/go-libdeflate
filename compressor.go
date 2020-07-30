@@ -59,7 +59,7 @@ func (c Compressor) Compress(in, out []byte, m Mode) (int, []byte, error) {
 	case ModeGzip:
 		return c.c.Compress(in, out, native.CompressGzip)
 	default:
-		panic("libdeflate: compress: invalid mode")
+		panic(errorInvalidModeCompressor)
 	}
 }
 
@@ -86,7 +86,7 @@ func (c Compressor) WorstCaseCompressedSize(size int, m Mode) (max int) {
 	case ModeGzip:
 		return c.c.UpperBound(size, native.GzipBound)
 	default:
-		panic("libdeflate: compress: invalid mode")
+		panic(errorInvalidModeCompressor)
 	}
 }
 
