@@ -46,7 +46,7 @@ func (dc Decompressor) Decompress(in, out []byte, m Mode) ([]byte, error) {
 	case ModeGzip:
 		return dc.dc.Decompress(in, out, native.DecompressGzip)
 	default:
-		panic("libdeflate: decompress: invalid mode")
+		panic(errorInvalidModeDecompressor)
 	}
 }
 
