@@ -14,9 +14,9 @@ import (
 
 // Compressor compresses data to zlib format at the specified level
 type Compressor struct {
-	c   *C.comp
+	c        *C.comp
 	isClosed bool
-	lvl int
+	lvl      int
 }
 
 // NewCompressor returns a new Compressor used to compress data.
@@ -76,6 +76,11 @@ func (c *Compressor) compress(in, out []byte, f compress) (int, []byte, error) {
 		return written, out, errorShortBuffer
 	}
 	return written, out, nil
+}
+
+// UpperBound works as described in native/libs/libdeflate.h
+func (c *Compressor) UpperBound(size int, f bound) int {
+	return f(c.c, size)
 }
 
 // Close frees the memory allocated by C objects
