@@ -32,25 +32,27 @@ func NewDecompressor() (*Decompressor, error) {
 // If error != nil, then the data in out is undefined.
 // If you pass a buffer to out, the size of this buffer must exactly match the length of the decompressed data.
 // If you pass nil as out, this function will allocate a sufficient buffer and return it.
-func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error) {
+// Returns the number of consumed bytes from 'in'
+func (dc *Decompressor) Decompress(in, out []byte, f decompress) (int, []byte, error) {
 	if dc.isClosed {
 		panic(errorAlreadyClosed)
 	}
 	if len(in) == 0 {
-		return out, errorNoInput
+		return 0, out, errorNoInput
 	}
 
 	if out != nil {
-		_, err := dc.decompress(in, out, true, f)
-		return out, err
+		cons, _, err := dc.decompress(in, out, true, f)
+		return cons, out, err
 	}
 
+	cons := 0
 	n := 0
 	inc := 6
 	err := errorInsufficientSpace
 	for err == errorInsufficientSpace {
 		out = make([]byte, len(in)*inc)
-		n, err = dc.decompress(in, out, false, f)
+		cons, n, err = dc.decompress(in, out, false, f)
 		if inc >= 16 {
 			inc += 3
 			continue
@@ -58,27 +60,31 @@ func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error)
 		inc += 5
 	}
 
-	return out[:n], err
+	return cons, out[:n], err
 }
 
-func (dc *Decompressor) decompress(in, out []byte, fit bool, f decompress) (int, error) {
+func (dc *Decompressor) decompress(in, out []byte, fit bool, f decompress) (int, int, error) {
 	inAddr := startMemAddr(in)
 	outAddr := startMemAddr(out)
 
-	var s int64
-	sPtr := uintptr(unsafe.Pointer(&s))
+	var (
+		cons int
+		n int
+	)
+
+	consPtr := uintptr(unsafe.Pointer(&cons))
+	sPtr := uintptr(unsafe.Pointer(&n))
 	if fit {
 		sPtr = 0
 	}
 
-	err := f(dc.dc, inAddr, outAddr, len(in), len(out), sPtr)
+	err := f(dc.dc, inAddr, outAddr, len(in), len(out), consPtr, sPtr)
 
-	n := len(out)
-	if !fit {
-		n = int(s)
+	if fit {
+		n = len(out)
 	}
 
-	return n, err
+	return cons, n, err
 }
 
 // Close frees the memory allocated by C objects

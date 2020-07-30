@@ -141,10 +141,10 @@ func TestCompressDecompress(t *testing.T) {
 	out := make([]byte, len(shortString))
 	dc, _ := NewDecompressor()
 	defer dc.Close()
-	if _, err := dc.DecompressZlib(comp, out); err != nil {
+	if c, _, err := dc.DecompressZlib(comp, out); err != nil || c != len(comp){
 		t.Error(err)
 	}
-	slicesEqual([]byte(shortString), out, t)
+	slicesEqual(shortString, out, t)
 }
 
 /*---------------------

@@ -22,13 +22,13 @@ func TestDecompressZlibConvenience(t *testing.T) {
 	out := make([]byte, len(shortString))
 	dc, _ := NewDecompressor()
 	defer dc.Close()
-	if _, err := DecompressZlib(in, out); err != nil {
+	if c, _, err := DecompressZlib(in, out); err != nil || c != len(in) {
 		t.Error(err)
 	}
 	slicesEqual([]byte(shortString), out, t)
 
-	out, err := dc.DecompressZlib(in, nil)
-	if err != nil {
+	c, out, err := dc.DecompressZlib(in, nil)
+	if err != nil || c != len(in) {
 		t.Error(err)
 	}
 	slicesEqual([]byte(shortString), out, t)
