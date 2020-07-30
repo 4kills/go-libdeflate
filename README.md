@@ -35,7 +35,7 @@ It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libr
    - [x] zlib/gzip/deflate decompression
    - [ ] Definite upper bound of compressed size
    - [ ] Decompression w/ info about number of consumed bytes
-   - [ ] adler32 and crc32 checksums
+   - [x] adler32 and crc32 checksums
    - [ ] ~~Custom memory allocator~~ : *no implementation planned, due to too little relevance for a high level go API*
    
 # Installation
