@@ -20,6 +20,7 @@ It is **siginificantly faster** than go's standard compress/zlib/gzip/flate libr
 - [Benchmarks](#benchmarks)
   - [Compression](#compression)
   - [Decompression](#decompression)
+  - [Compression Ratio](#compression-ratio)
 - [License](#license)
 - [Attribution](#attribution)
 
@@ -212,15 +213,6 @@ These benchmarks compare this library (blue) to the go standard library (yellow)
 
 ## Compression
 
-### Compression Ratio:
-
-Across all of the benchmarks on all the different hardware / operating systems the compression ratios were consistent: 
-This library had a compression ratio of **5.77** while the standard library had a compression ratio of **5.75**, which is a negligible difference. 
-
-The compression ratio is calculated as ratio = umcompressed size / compressed size.
-
----
-
 ![compression total](https://i.imgur.com/4eEFh5o.png)
 
 This chart shows how long it took for the methods of this library (blue) and the standard library (yellow) to compress **all** of the 930 packets (~11.5MB) on different systems in milliseconds. Note that the two rightmost data points were tested on **exactly the same** hardware in a dual-boot setup and that Linux seems to generally perform better than Windows.
@@ -244,6 +236,13 @@ This chart shows the time it took for this library's `Decompress` (blue) to deco
 
 For example: This library only needed ~34% of the time required by the standard library to decompress the packets on an Intel Core i5-6600K on Windows. 
 That makes the standard library a substantial **~194.1% slower** than this library.
+
+## Compression Ratio
+
+Across all of the benchmarks on all the different hardware / operating systems the compression ratios were consistent: 
+This library had a compression ratio of **5.77** while the standard library had a compression ratio of **5.75**, which is a negligible difference. 
+
+The compression ratio r is calculated as r = ucs / cs, where ucs = uncompressed size and cs = compressed size. 
 
 # License
 
