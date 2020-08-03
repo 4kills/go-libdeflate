@@ -190,15 +190,60 @@ There are also convenience methods that allow one-time compression to be easier 
 
 # Benchmarks
 
-COMMING SOON (GATHERING DATA)
+These benchmarks were conducted with "real-life-type data" to ensure that these tests are most representative for an actual use case in a practical production environment.
+As the zlib standard has been traditionally used for compressing smaller chunks of data, I have decided to follow suite by opting for Minecraft client-server communication packets, as they represent the optimal use case for this library. 
+
+To that end, I have recorded 930 individual Minecraft packets, totalling 11,445,993 bytes in umcompressed data and 1,564,159 bytes in compressed data.
+These packets represent actual client-server communication and were recorded using [this](https://github.com/haveachin/infrared) software.
+
+The benchmarks were executed on different hardware and operating systems, including AMD and Intel processors, as well as all the out-of-the-box supported operating systems (Windows, Linux, MacOS). All of the benchmarked functions/methods were executed hundreds of times and the numbers you are about to see are the averages over all these executions.
+
+The data was compressed using compression level 6 (current default of zlib). 
+
+These benchmarks compare this library (blue) to the go standard library (yellow) and show that this library performs **way** better in all cases. 
+
+- <details>
+  
+    <summary> (A note regarding testing on your machine) </summary>
+  
+    Please note that you will need an Internet connection for some of the benchmarks to function. This is because these benchmarks will download the mc packets from [here](https://github.com/4kills/zlib_benchmark) and temporarily store them in memory for the duration of the benchmark tests, so this repository won't have to include the data in order save space on your machine and to make it a lightweight library.
+  
+  </details>
 
 ## Compression
 
-COMMING SOON (GATHERING DATA)
+### Compression Ratio:
+
+Across all of the benchmarks on all the different hardware / operating systems the compression ratios were consistent: 
+This library had a compression ratio of **5.77** while the standard library had a compression ratio of **5.75**, which is a negligible difference. 
+
+The compression ratio is calculated as ratio = umcompressed size / compressed size.
+
+---
+
+![compression total](https://i.imgur.com/4eEFh5o.png)
+
+This chart shows how long it took for the methods of this library (blue) and the standard library (yellow) to compress **all** of the 930 packets (~11.5MB) on different systems in milliseconds. Note that the two rightmost data points were tested on **exactly the same** hardware in a dual-boot setup and that Linux seems to generally perform better than Windows.
+
+![compression relative](https://i.imgur.com/K68qwFF.png)
+
+This chart shows the time it took for this library's `Compress` (blue) to compress the data in nanoseconds, as well as the time it took for the standard library's `Write` (WriteStd, yellow) to compress the data in nanoseconds. The vertical axis shows percentages relative to the time needed by the standard library, thus you can see how much faster this library is. 
+
+For example: This library only needed ~29% of the time required by the standard library to compress the packets on an Intel Core i5-6600K on Windows. 
+That makes the standard library a substantial **~244.8% slower** than this library. 
 
 ## Decompression
 
-COMMING SOON (GATERHING DATA)
+![compression total](https://i.imgur.com/aW9L4cx.png)
+
+This chart shows how long it took for the methods of this library (blue) and the standard library (yellow) to decompress **all** of the 930 packets (~1.5MB) on different systems in milliseconds. Note that the two rightmost data points were tested on **exactly the same** hardware in a dual-boot setup and that Linux seems to generally perform better than Windows.
+
+![dcompression relative](https://i.imgur.com/lVhGfWO.png)
+
+This chart shows the time it took for this library's `Decompress` (blue) to decompress the data in nanoseconds, as well as the time it took for the standard library's `Read` (ReadStd, Yellow) to decompress the data in nanoseconds. The vertical axis shows percentages relative to the time needed by the standard library, thus you can see how much faster this library is. 
+
+For example: This library only needed ~34% of the time required by the standard library to decompress the packets on an Intel Core i5-6600K on Windows. 
+That makes the standard library a substantial **~194.1% slower** than this library.
 
 # License
 
