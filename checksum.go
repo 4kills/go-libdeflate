@@ -1,7 +1,7 @@
 package libdeflate
 
 import (
-	"github.com/4kills/libdeflate/native"
+	"github.com/4kills/go-libdeflate/native"
 )
 
 /*

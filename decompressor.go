@@ -1,6 +1,6 @@
 package libdeflate
 
-import "github.com/4kills/libdeflate/native"
+import "github.com/4kills/go-libdeflate/native"
 
 // Decompressor decompresses any DEFLATE, zlib or gzip compressed data at any level
 //

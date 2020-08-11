@@ -1,6 +1,6 @@
 package libdeflate
 
-import "github.com/4kills/libdeflate/native"
+import "github.com/4kills/go-libdeflate/native"
 
 // These constants specify several special compression levels
 const (
