@@ -2,14 +2,14 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This library wraps the [libdeflate](https://github.com/ebiggers/libdeflate) zlib-, gzip- and deflate-(de)compression library for golang, using cgo.
+This library wraps the [libdeflate](https://github.com/ebiggers/libdeflate) zlib-, gzip- and deflate-(de)compression library for Go, using cgo.
 
-It is **significantly faster** than go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data. Therefore, this library is optimal for the special use case of (de)compressing whole-buffered in-memory data: If it fits into your RAM, this library can (de)compress it much faster than the standard libraries can. 
+It is **significantly faster** than Go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data. Therefore, this library is optimal for the special use case of (de)compressing whole-buffered in-memory data: If it fits into your RAM, this library can (de)compress it much faster than the standard libraries can. 
 
 ## Table of Contents
 
 - [Features](#features)
-  - [Completeness of the go Wrapper](#availability-of-the-original-libdeflate-api)
+  - [Completeness of the Go Wrapper](#availability-of-the-original-libdeflate-api)
 - [Installation](#installation)
   - [Prerequisites (cgo)](#prerequisites-working-cgo)
   - [Download and Installation](#download-and-installation)
@@ -37,13 +37,13 @@ It is **significantly faster** than go's standard compress/zlib/gzip/flate libra
    - [x] Definite upper bound of compressed size
    - [x] Decompression w/ info about number of consumed bytes
    - [x] adler32 and crc32 checksums
-   - [ ] ~~Custom memory allocator~~ : *no implementation planned, due to too little relevance for a high level go API*
+   - [ ] ~~Custom memory allocator~~ : *no implementation planned, due to too little relevance for a high level Go API*
    
 # Installation
 
 ## Prerequisites (working [cgo](https://golang.org/cmd/cgo/))
 
-In order to use this library with your go source code, you must be able to use the go tool **[cgo](https://golang.org/cmd/cgo/)**, which, in turn, requires a **GCC compiler**.
+In order to use this library with your Go source code, you must be able to use the Go tool **[cgo](https://golang.org/cmd/cgo/)**, which, in turn, requires a **GCC compiler**.
 
 If you are on **Linux**, there is a good chance you already have GCC installed, otherwise just get it with your favorite package manager.
 
@@ -59,9 +59,9 @@ For **any other** the procedure should be about the same. Just google.
 
 ## Download and Installation
 
-If you want to build for `$GOARCH=amd64` and either **Windows, Linux** or **MacOS** just go get this library and everything will work right away. 
+If you want to build for `$GOARCH=amd64` and either **Windows, Linux** or **MacOS** just Go get this library and everything will work right away. 
 
-(You may also use go modules (available since go 1.11) to get the version of a specific branch or tag if you want to try out or use experimental features. However, beware that these versions are not necessarily guaranteed to be stable or thoroughly tested.)
+(You may also use Go modules (available since Go 1.11) to get the version of a specific branch or tag if you want to try out or use experimental features. However, beware that these versions are not necessarily guaranteed to be stable or thoroughly tested.)
 
 <details>
 
@@ -185,7 +185,7 @@ There are also convenience functions that allow one-time compression to be easie
 
 - **Do NOT use the <ins>same</ins> Compressor / Decompressor across multiple threads <ins>simultaneously</ins>.** However, you can create as many of them as you like, so if you want to parallelize your application, just create a compressor / decompressor for each thread. (See Memory Usage down below for more info)
 
-- **Always `Close()` your Compressor / Decompressor when you are done with it** - especially if you create a new compressor/decompressor for each compression/decompression you undertake (which is generally discouraged anyway). As the C-part of this library is not subject to the go garbage collector, the memory allocated by it must be released manually (by a call to `Close()`) to avoid memory leakage.
+- **Always `Close()` your Compressor / Decompressor when you are done with it** - especially if you create a new compressor/decompressor for each compression/decompression you undertake (which is generally discouraged anyway). As the C-part of this library is not subject to the Go garbage collector, the memory allocated by it must be released manually (by a call to `Close()`) to avoid memory leakage.
 
 - Memory Usage: `Compressing` requires at least ~32 KiB of additional memory during execution, while `Decompressing` also requires at least ~32 KiB of additional memory during execution. 
 
@@ -201,7 +201,7 @@ The benchmarks were executed on different hardware and operating systems, includ
 
 The data was compressed using compression level 6 (current default of zlib). 
 
-These benchmarks compare this library (blue) to the go standard library (yellow) and show that this library performs **way** better in all cases. 
+These benchmarks compare this library (blue) to the Go standard library (yellow) and show that this library performs **way** better in all cases. 
 
 - <details>
   
