@@ -76,7 +76,7 @@ This prediction is a wild overestimate in most cases, for which holds true: max 
 However, it gives a hard maximal bound of the size of compressed data, compressing with the given mode
 at the compression level of the this compressor, independent of the actual data.
 This method will always return the same max size for the same compressor, input size and mode.
- */
+*/
 func (c Compressor) WorstCaseCompressedSize(size int, m Mode) (max int) {
 	switch m {
 	case ModeDEFLATE:

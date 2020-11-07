@@ -35,40 +35,14 @@ func TestDecompress(t *testing.T) {
 	out := make([]byte, len(shortString))
 	dc, _ := NewDecompressor()
 	defer dc.Close()
-	if c, _, err := dc.Decompress(in, out, DecompressZlib); err != nil || c != len(in) {
+	if _, err := dc.Decompress(in, out, DecompressZlib); err != nil {
 		t.Error(err)
 	}
-	slicesEqual(shortString, out, t)
+	slicesEqual([]byte(shortString), out, t)
 
-	c, out, err := dc.Decompress(in, nil, DecompressZlib)
-	if err != nil || c != len(in){
+	out, err := dc.Decompress(in, nil, DecompressZlib)
+	if err != nil {
 		t.Error(err)
 	}
-	slicesEqual(shortString, out, t)
-}
-
-func TestDecompressOversizedInput(t *testing.T) {
-	// compress with go standard zlib
-	buf := &bytes.Buffer{}
-	w := zlib.NewWriter(buf)
-	w.Write([]byte(shortString))
-	w.Close()
-	in := buf.Bytes()
-
-	// decompress with this lib
-
-	oversized := append(in, in...)
-	out := make([]byte, len(shortString))
-	dc, _ := NewDecompressor()
-	defer dc.Close()
-	if c, _, err := dc.Decompress(oversized, out, DecompressZlib); err != nil || c != len(in) {
-		t.Error(err)
-	}
-	slicesEqual(shortString, out, t)
-
-	c, out, err := dc.Decompress(oversized, nil, DecompressZlib)
-	if err != nil || c != len(in){
-		t.Error(err)
-	}
-	slicesEqual(shortString, out, t)
+	slicesEqual([]byte(shortString), out, t)
 }
