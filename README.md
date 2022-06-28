@@ -1,10 +1,15 @@
-# libdeflate for go
+# libdeflate (optimized zlib) for go
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This library wraps the [libdeflate](https://github.com/ebiggers/libdeflate) zlib-, gzip- and deflate-(de)compression library for Go, using cgo.
+This ultra fast Go zlib library wraps the [libdeflate](https://github.com/ebiggers/libdeflate) zlib-, gzip- and deflate-(de)compression library for Go, using cgo.
 
-It is **significantly faster** than Go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data. Therefore, this library is optimal for the special use case of (de)compressing whole-buffered in-memory data: If it fits into your RAM, this library can (de)compress it much faster than the standard libraries can. 
+It is **significantly faster** (4-5 times) than Go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data (e.g. from disk). Therefore, this library is optimal for the use case of **(de)compressing whole-buffered in-memory data**: If it fits into your memory, this library can (de)compress it much faster than the standard libraries (or even C zlib) can. 
+
+```diff
++ If you start using this library, use V2.
+```
+For a better user experience right from the start use V2 via `go get github.com/4kills/go-libdeflate/v2`. 
 
 ## Table of Contents
 
