@@ -20,6 +20,15 @@ func NewDecompressor() (Decompressor, error) {
 	return Decompressor{dc}, err
 }
 
+// NewDecompressorWithExtendedDecompression returns a new Decompressor used to decompress data at any compression level and with any Mode.
+// maxDecompressionFactor customizes how much larger your output than your input may be. This is set to a sensible default,
+// however, it might need some tweaking if you have a huge compression factor. Usually, NewDecompressor should suffice.
+// Errors if out of memory. Allocates 32KiB.
+func NewDecompressorWithExtendedDecompression(maxDecompressionFactor int) (Decompressor, error) {
+	dc, err := native.NewDecompressorWithExtendedDecompression(maxDecompressionFactor)
+	return Decompressor{dc}, err
+}
+
 // DecompressZlib decompresses the given zlib data from in to out and returns the number of consumed bytes c
 // from 'in' and 'out' or an error if something went wrong.
 //
