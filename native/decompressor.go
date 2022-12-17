@@ -16,16 +16,22 @@ import "unsafe"
 type Decompressor struct {
 	dc *C.decomp
 	isClosed bool
+	maxDecompressionFactor int
 }
 
-// NewDecompressor returns a new Decompressor or and error if out of memory
+// NewDecompressor returns a new Decompressor with maxDecompressionFactor = 30 or and error if out of memory
 func NewDecompressor() (*Decompressor, error) {
+	return NewDecompressorWithExtendedDecompression(30)
+}
+
+// NewDecompressorWithExtendedDecompression returns a new Decompressor with maxDecompressionFactor or and error if out of memory
+func NewDecompressorWithExtendedDecompression(maxDecompressionFactor int) (*Decompressor, error) {
 	dc := C.libdeflate_alloc_decompressor()
 	if C.isNull(unsafe.Pointer(dc)) == 1 {
 		return nil, errorOutOfMemory
 	}
 
-	return &Decompressor{dc, false}, nil
+	return &Decompressor{dc, false, maxDecompressionFactor}, nil
 }
 
 // Decompress decompresses the given data from in to out and returns out and an error if something went wrong.
@@ -46,16 +52,21 @@ func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error)
 	}
 
 	n := 0
-	inc := 6
+	decompFactor := 6
 	err := errorInsufficientSpace
 	for err == errorInsufficientSpace {
-		out = make([]byte, len(in)*inc)
+		out = make([]byte, len(in)*decompFactor)
 		n, err = dc.decompress(in, out, false, f)
-		if inc >= 16 {
-			inc += 3
+
+		if decompFactor > dc.maxDecompressionFactor {
+			return out, errorInsufficientDecompressionFactor
+		}
+
+		if decompFactor >= 16 {
+			decompFactor += 3
 			continue
 		}
-		inc += 5
+		decompFactor += 5
 	}
 
 	return out[:n], err
