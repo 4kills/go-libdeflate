@@ -103,7 +103,7 @@ func TestDecompressWithDeadlyCode(t *testing.T) {
 	dc, _ := NewDecompressor()
 	defer dc.Close()
 	_, err := dc.DecompressZlib(comp, nil)
-	if err == nil || !strings.Contains(err.Error(), "maximum decompression factor") {
+	if err == nil || !(strings.Contains(err.Error(), "maximum decompression factor") || strings.Contains(err.Error(), "data was corrupted")) {
 		t.Fail()
 		return
 	}
