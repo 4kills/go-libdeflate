@@ -245,15 +245,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-# Attribution
-
-This library heavily depends on the C library [libdeflate](https://github.com/ebiggers/libdeflate), so everything in the folder native/libs is licensed under:
-
-```
-MIT License 
-[for the license text of the MIT License, see LICENSE]
-
-Copyright 2016 Eric Biggers
-```
-
-(See also: native/libs/LICENSE) 
