@@ -91,3 +91,11 @@ func (c *Compressor) Close() {
 	C.libdeflate_free_compressor(c.c)
 	c.isClosed = true
 }
+
+// PanicFreeClose is like Close but doesn't panic if the compressor is already closed. This is useful for the higher-level autoclose functionality.
+func (c *Compressor) PanicFreeClose() {
+	if c.isClosed {
+		return
+	}
+	c.Close()
+}

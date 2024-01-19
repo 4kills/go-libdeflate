@@ -1,17 +1,41 @@
 package libdeflate
 
-import "github.com/4kills/go-libdeflate/v2/native"
+import (
+	"github.com/4kills/go-libdeflate/v2/native"
+)
 
 // Compressor compresses data at the specified compression level.
 //
 // A single compressor must not not be used across multiple threads concurrently.
 // If you want to compress concurrently, create a compressor for each thread.
 //
-// Always Close() the decompressor to free c memory.
+// Always Close() the decompressor to free c memory or use the AutoClose constructors, which will automatically close the Compressor at garabage collection time of the underlying natvie equivalent.
 // One Compressor allocates at least 32 KiB.
 type Compressor struct {
 	c   *native.Compressor
 	lvl int
+}
+
+// NewCompressorAutoClose returns a Compressor used to compress data with compression level DefaultCompressionLevel and AutoClose functionality.
+// This will close the Compressor automatically, when it is no longer used.
+// Errors if out of memory. Allocates 32KiB.
+// See NewCompressorLevelPointer for custom compression level
+func NewCompressorAutoClose() (Compressor, error) {
+	compressor, err := NewCompressorLevelAutoClose(DefaultCompressionLevel)
+	return compressor, err
+}
+
+// NewCompressorLevelAutoClose returns a new pointer to a Compressor used to compress data and AutoClose functionality.
+// This will close the Compressor automatically, when it is no longer used.
+// Errors if out of memory or if an invalid compression level was passed.
+// Allocates 32KiB.
+//
+// The compression level is legal if and only if:
+// MinCompressionLevel <= level <= MaxCompressionLevel
+func NewCompressorLevelAutoClose(level int) (Compressor, error) {
+	compressor, err := NewCompressorLevel(level)
+	attachAutoClose(compressor.c)
+	return compressor, err
 }
 
 // NewCompressor returns a new Compressor used to compress data with compression level DefaultCompressionLevel.

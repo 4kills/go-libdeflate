@@ -7,10 +7,30 @@ import "github.com/4kills/go-libdeflate/v2/native"
 // A single decompressor must not not be used across multiple threads concurrently.
 // If you want to decompress concurrently, create a decompressor for each thread.
 //
-// Always Close() the decompressor to free c memory.
+// Always Close() the decompressor to free c memory or use the AutoClose constructors, which will automatically close the Compressor at garabage collection time of the underlying natvie equivalent.
 // One Decompressor allocates at least 32KiB.
 type Decompressor struct {
 	dc *native.Decompressor
+}
+
+// NewDecompressor returns a new Decompressor used to decompress data at any compression level and with any Mode. It has AutoClose functionality.
+// This will close the Decompressor automatically, when it is no longer used.
+// Errors if out of memory. Allocates 32KiB.
+func NewDecompressorAutoClose() (Decompressor, error) {
+	decompressor, err := NewDecompressor()
+	attachAutoClose(decompressor.dc)
+	return decompressor, err
+}
+
+// NewDecompressorWithExtendedDecompression returns a new Decompressor used to decompress data at any compression level and with any Mode.
+// It has AutoClose functionality, which will close the Decompressor automatically, when it is no longer used.
+// maxDecompressionFactor customizes how much larger your output than your input may be. This is set to a sensible default,
+// however, it might need some tweaking if you have a huge compression factor. Usually, NewDecompressor should suffice.
+// Errors if out of memory. Allocates 32KiB.
+func NewDecompressorAutoCloseWithExtendedDecompression(maxDecompressionFactor int) (Decompressor, error) {
+	decompressor, err := NewDecompressorWithExtendedDecompression(maxDecompressionFactor)
+	attachAutoClose(decompressor.dc)
+	return decompressor, err
 }
 
 // NewDecompressor returns a new Decompressor used to decompress data at any compression level and with any Mode.

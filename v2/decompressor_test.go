@@ -89,6 +89,31 @@ func TestDecompressZlib(t *testing.T) {
 	slicesEqual(shortString, out, t)
 }
 
+func TestDecompressZlib_AutoClose(t *testing.T) {
+	// compress with go standard lib
+	buf := &bytes.Buffer{}
+	w := zlib.NewWriter(buf)
+	w.Write(shortString)
+	w.Close()
+	in := buf.Bytes()
+
+	// decompress with this lib
+
+	out := make([]byte, len(shortString))
+	dc, _ := NewDecompressorAutoClose()
+	defer dc.Close()
+	if c, _, err := dc.DecompressZlib(in, out); err != nil || c != len(in) {
+		t.Error(err)
+	}
+	slicesEqual(shortString, out, t)
+
+	c, out, err := dc.DecompressZlib(in, nil)
+	if err != nil || c != len(in) {
+		t.Error(err)
+	}
+	slicesEqual(shortString, out, t)
+}
+
 var (
 	deadlyCode = "789c7d90316f83301085f7fc0ac45cac3b1b63cc0685542c55a4264b1784825bd1024686284851fe7b8104c454c" +
 		"b8bdff7de9def6e3b6b3cf6db298dedc0b26f02384014858efb2af78ecb1573c224e24e92301e4919d158c0dd7e7" +

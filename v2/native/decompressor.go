@@ -14,8 +14,8 @@ import "unsafe"
 
 // Decompressor decompresses any DEFLATE, zlib or gzip compressed data at any level
 type Decompressor struct {
-	dc *C.decomp
-	isClosed bool
+	dc                     *C.decomp
+	isClosed               bool
 	maxDecompressionFactor int
 }
 
@@ -80,7 +80,7 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool, f decompress) (int,
 
 	var (
 		cons int
-		n int
+		n    int
 	)
 
 	consPtr := uintptr(unsafe.Pointer(&cons))
@@ -105,4 +105,12 @@ func (dc *Decompressor) Close() {
 	}
 	C.libdeflate_free_decompressor(dc.dc)
 	dc.isClosed = true
+}
+
+// PanicFreeClose is like Close but doesn't panic if the decompressor is already closed. This is useful for the higher-level autoclose functionality.
+func (c *Decompressor) PanicFreeClose() {
+	if c.isClosed {
+		return
+	}
+	c.Close()
 }
