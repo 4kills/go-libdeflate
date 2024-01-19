@@ -8,8 +8,9 @@ It is **significantly faster** (4-5 times) than Go's standard compress/zlib/gzip
 
 ```diff
 + If you start using this library, use V2.
+- V1 will be deprecated by January 19, 2025. Until then it will receive bug fixes but no feature improvements.
 ```
-For a better user experience right from the start use V2 via `go get github.com/4kills/go-libdeflate/v2`. 
+Start using V2 via `go get github.com/4kills/go-libdeflate/v2`. 
 
 ## Table of Contents
 
