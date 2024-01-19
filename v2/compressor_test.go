@@ -101,6 +101,22 @@ func TestCompressZlib(t *testing.T) {
 	slicesEqual([]byte(shortString), decomp, t)
 }
 
+func TestCompressZlib_AutoClose(t *testing.T) {
+	c, _ := NewCompressorAutoClose()
+	defer c.Close()
+	_, comp, err := c.CompressZlib(shortString, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	r, _ := zlib.NewReader(bytes.NewBuffer(comp))
+	defer r.Close()
+	decomp := make([]byte, len(shortString))
+	r.Read(decomp)
+
+	slicesEqual([]byte(shortString), decomp, t)
+}
+
 // this test doesn't really say as much as TestCompress
 func TestCompressMeta(t *testing.T) {
 	c, _ := NewCompressor()
@@ -141,7 +157,7 @@ func TestCompressDecompress(t *testing.T) {
 	out := make([]byte, len(shortString))
 	dc, _ := NewDecompressor()
 	defer dc.Close()
-	if c, _, err := dc.DecompressZlib(comp, out); err != nil || c != len(comp){
+	if c, _, err := dc.DecompressZlib(comp, out); err != nil || c != len(comp) {
 		t.Error(err)
 	}
 	slicesEqual(shortString, out, t)
