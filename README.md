@@ -6,11 +6,12 @@ This ultra fast Go zlib library wraps the [libdeflate](https://github.com/ebigge
 
 It is **significantly faster** (4-5 times) than Go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data (e.g. from disk). Therefore, this library is optimal for the use case of **(de)compressing whole-buffered in-memory data**: If it fits into your memory, this library can (de)compress it much faster than the standard libraries (or even C zlib) can. 
 
-```diff
-+ If you start using this library, use V2.
-- V1 will be deprecated by January 19, 2025. Until then it will receive bug fixes but no feature improvements.
-```
-Start using V2 via `go get github.com/4kills/go-libdeflate/v2`. 
+> [!IMPORTANT]  
+> Use V2 of this library  via `go get github.com/4kills/go-libdeflate/v2`!
+
+> [!WARNING]  
+> V1 will be deprecated by January 19, 2025. Until then it will receive bug fixes but no feature improvements.
+
 
 ## Table of Contents
 
