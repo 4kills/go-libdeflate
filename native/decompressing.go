@@ -9,7 +9,7 @@ typedef enum libdeflate_result res;
 size_t* mkPtr(size_t s) {
 	return (size_t*) s;
 }
- */
+*/
 import "C"
 import "unsafe"
 

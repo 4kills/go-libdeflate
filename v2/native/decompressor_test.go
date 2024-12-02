@@ -41,7 +41,7 @@ func TestDecompress(t *testing.T) {
 	slicesEqual(shortString, out, t)
 
 	c, out, err := dc.Decompress(in, nil, DecompressZlib)
-	if err != nil || c != len(in){
+	if err != nil || c != len(in) {
 		t.Error(err)
 	}
 	slicesEqual(shortString, out, t)
@@ -67,7 +67,7 @@ func TestDecompressOversizedInput(t *testing.T) {
 	slicesEqual(shortString, out, t)
 
 	c, out, err := dc.Decompress(oversized, nil, DecompressZlib)
-	if err != nil || c != len(in){
+	if err != nil || c != len(in) {
 		t.Error(err)
 	}
 	slicesEqual(shortString, out, t)

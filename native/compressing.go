@@ -4,7 +4,7 @@ package native
 #include "libdeflate.h"
 
 typedef struct libdeflate_compressor comp;
- */
+*/
 import "C"
 import "unsafe"
 
