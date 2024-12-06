@@ -14,8 +14,8 @@ import "unsafe"
 
 // Decompressor decompresses any DEFLATE, zlib or gzip compressed data at any level
 type Decompressor struct {
-	dc *C.decomp
-	isClosed bool
+	dc                     *C.decomp
+	isClosed               bool
 	maxDecompressionFactor int
 }
 

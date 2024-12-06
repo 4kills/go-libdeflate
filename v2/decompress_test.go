@@ -6,9 +6,13 @@ import (
 	"testing"
 )
 
-/*---------------------
-		UNIT TESTS
------------------------*/
+/*
+---------------------
+
+	UNIT TESTS
+
+-----------------------
+*/
 func TestDecompressZlibConvenience(t *testing.T) {
 	// compress with go standard lib
 	buf := &bytes.Buffer{}
