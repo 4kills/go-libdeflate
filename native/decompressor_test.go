@@ -11,10 +11,10 @@ import (
 -----------------------*/
 
 func TestParseResult(t *testing.T) {
-	if err := parseResult(1); err != errorBadData {
+	if err := parseResult(1); err != ErrorBadData {
 		t.Fail()
 	}
-	if err := parseResult(200); err != errorUnknown {
+	if err := parseResult(200); err != ErrorUnknown {
 		t.Fail()
 	}
 	if err := parseResult(0); err != nil {

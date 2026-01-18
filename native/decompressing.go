@@ -47,12 +47,12 @@ func parseResult(r C.res) error {
 	case C.LIBDEFLATE_SUCCESS:
 		return nil
 	case C.LIBDEFLATE_BAD_DATA:
-		return errorBadData
+		return ErrorBadData
 	case C.LIBDEFLATE_SHORT_OUTPUT:
-		return errorShortOutput
+		return ErrorShortOutput
 	case C.LIBDEFLATE_INSUFFICIENT_SPACE:
-		return errorInsufficientSpace
+		return ErrorInsufficientSpace
 	default:
-		return errorUnknown
+		return ErrorUnknown
 	}
 }

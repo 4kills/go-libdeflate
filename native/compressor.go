@@ -23,12 +23,12 @@ type Compressor struct {
 // Errors if out of memory or invalid lvl
 func NewCompressor(lvl int) (*Compressor, error) {
 	if lvl < MinCompressionLevel || lvl > MaxCompressionLevel {
-		return nil, errorInvalidLevel
+		return nil, ErrorInvalidLevel
 	}
 
 	c := C.libdeflate_alloc_compressor(C.int(lvl))
 	if C.isNull(unsafe.Pointer(c)) == 1 {
-		return nil, errorOutOfMemory
+		return nil, ErrorOutOfMemory
 	}
 
 	return &Compressor{c, false, lvl}, nil
@@ -43,10 +43,10 @@ func NewCompressor(lvl int) (*Compressor, error) {
 // If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
 func (c *Compressor) Compress(in, out []byte, f compress) (int, []byte, error) {
 	if c.isClosed {
-		panic(errorAlreadyClosed)
+		panic(ErrorAlreadyClosed)
 	}
 	if len(in) == 0 {
-		return 0, out, errorNoInput
+		return 0, out, ErrorNoInput
 	}
 
 	if out != nil {
@@ -57,7 +57,7 @@ func (c *Compressor) Compress(in, out []byte, f compress) (int, []byte, error) {
 	out = make([]byte, len(in))
 	n, out, err := c.compress(in, out, f)
 
-	if err == errorShortBuffer { // if still doesn't fit (shouldn't happen at all)
+	if err == ErrorShortBuffer { // if still doesn't fit (shouldn't happen at all)
 		out = make([]byte, 1000+len(in)*2)
 		n, _, _ := c.compress(in, out, f)
 		outSmallCap := make([]byte, len(out))
@@ -77,7 +77,7 @@ func (c *Compressor) compress(in, out []byte, f compress) (int, []byte, error) {
 	written := f(c.c, inAddr, outAddr, len(in), len(out))
 
 	if written == 0 {
-		return written, out, errorShortBuffer
+		return written, out, ErrorShortBuffer
 	}
 	return written, out, nil
 }
@@ -90,7 +90,7 @@ func (c *Compressor) UpperBound(size int, f bound) int {
 // Close frees the memory allocated by C objects
 func (c *Compressor) Close() {
 	if c.isClosed {
-		panic(errorAlreadyClosed)
+		panic(ErrorAlreadyClosed)
 	}
 	C.libdeflate_free_compressor(c.c)
 	c.isClosed = true

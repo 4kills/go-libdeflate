@@ -28,7 +28,7 @@ func NewDecompressor() (*Decompressor, error) {
 func NewDecompressorWithExtendedDecompression(maxDecompressionFactor int) (*Decompressor, error) {
 	dc := C.libdeflate_alloc_decompressor()
 	if C.isNull(unsafe.Pointer(dc)) == 1 {
-		return nil, errorOutOfMemory
+		return nil, ErrorOutOfMemory
 	}
 
 	return &Decompressor{dc, false, maxDecompressionFactor}, nil
@@ -40,10 +40,10 @@ func NewDecompressorWithExtendedDecompression(maxDecompressionFactor int) (*Deco
 // If you pass nil as out, this function will allocate a sufficient buffer and return it.
 func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error) {
 	if dc.isClosed {
-		panic(errorAlreadyClosed)
+		panic(ErrorAlreadyClosed)
 	}
 	if len(in) == 0 {
-		return out, errorNoInput
+		return out, ErrorNoInput
 	}
 
 	if out != nil {
@@ -53,13 +53,13 @@ func (dc *Decompressor) Decompress(in, out []byte, f decompress) ([]byte, error)
 
 	n := 0
 	decompFactor := 6
-	err := errorInsufficientSpace
-	for err == errorInsufficientSpace {
+	err := ErrorInsufficientSpace
+	for err == ErrorInsufficientSpace {
 		out = make([]byte, len(in)*decompFactor)
 		n, err = dc.decompress(in, out, false, f)
 
 		if decompFactor > dc.maxDecompressionFactor {
-			return out, errorInsufficientDecompressionFactor
+			return out, ErrorInsufficientDecompressionFactor
 		}
 
 		if decompFactor >= 16 {
@@ -95,7 +95,7 @@ func (dc *Decompressor) decompress(in, out []byte, fit bool, f decompress) (int,
 // Close frees the memory allocated by C objects
 func (dc *Decompressor) Close() {
 	if dc.isClosed {
-		panic(errorAlreadyClosed)
+		panic(ErrorAlreadyClosed)
 	}
 	C.libdeflate_free_decompressor(dc.dc)
 	dc.isClosed = true
