@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func compressWithStdLib(toCompress []byte) []byte {
+	buf := &bytes.Buffer{}
+	w := zlib.NewWriter(buf)
+	w.Write([]byte(toCompress))
+	w.Close()
+	compressed := buf.Bytes()
+	return compressed
+}
+
 /*---------------------
 		UNIT TESTS
 -----------------------*/
@@ -22,13 +31,20 @@ func TestParseResult(t *testing.T) {
 	}
 }
 
+func TestDecompressNewDecompressorWithExtendedDecompression(t *testing.T) {
+	in := compressWithStdLib(shortString)
+
+	out := make([]byte, len(shortString))
+	dc, _ := NewDecompressorWithExtendedDecompression(3)
+	defer dc.Close()
+	if c, _, err := dc.Decompress(in, out, DecompressZlib); err != nil || c != len(in) {
+		t.Error(err)
+	}
+	slicesEqual(shortString, out, t)
+}
+
 func TestDecompress(t *testing.T) {
-	// compress with go standard zlib
-	buf := &bytes.Buffer{}
-	w := zlib.NewWriter(buf)
-	w.Write([]byte(shortString))
-	w.Close()
-	in := buf.Bytes()
+	in := compressWithStdLib(shortString)
 
 	// decompress with this lib
 
@@ -48,12 +64,7 @@ func TestDecompress(t *testing.T) {
 }
 
 func TestDecompressOversizedInput(t *testing.T) {
-	// compress with go standard zlib
-	buf := &bytes.Buffer{}
-	w := zlib.NewWriter(buf)
-	w.Write([]byte(shortString))
-	w.Close()
-	in := buf.Bytes()
+	in := compressWithStdLib(shortString)
 
 	// decompress with this lib
 

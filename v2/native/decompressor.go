@@ -55,6 +55,9 @@ func (dc *Decompressor) Decompress(in, out []byte, f decompress) (int, []byte, e
 	cons := 0
 	n := 0
 	decompFactor := 6
+	if dc.maxDecompressionFactor < decompFactor {
+		decompFactor = dc.maxDecompressionFactor
+	}
 	err := errorInsufficientSpace
 	for err == errorInsufficientSpace {
 		out = make([]byte, len(in)*decompFactor)
