@@ -40,7 +40,7 @@ func NewCompressor(lvl int) (*Compressor, error) {
 //
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
-// If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
+// If out == nil: For a too large discrepancy (len(out) > 1024 + 2 * len(in)) Compress will error
 func (c *Compressor) Compress(in, out []byte, f compress) (int, []byte, error) {
 	if c.isClosed {
 		panic(errorAlreadyClosed)
@@ -58,7 +58,7 @@ func (c *Compressor) Compress(in, out []byte, f compress) (int, []byte, error) {
 	n, out, err := c.compress(in, out, f)
 
 	if err == errorShortBuffer { // if still doesn't fit (shouldn't happen at all)
-		out = make([]byte, 1000+len(in)*2)
+		out = make([]byte, 1024+len(in)*2)
 		n, _, _ := c.compress(in, out, f)
 		outSmallCap := make([]byte, n)
 		copy(outSmallCap, out[:n])

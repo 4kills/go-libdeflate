@@ -7,7 +7,7 @@ This ultra fast Go zlib library wraps the [libdeflate](https://github.com/ebigge
 It is **significantly faster** (4-5 times) than Go's standard compress/zlib/gzip/flate libraries (see [benchmarks](#benchmarks)) at the expense of not being able to stream data (e.g. from disk). Therefore, this library is optimal for the use case of **(de)compressing whole-buffered in-memory data**: If it fits into your memory, this library can (de)compress it much faster than the standard libraries (or even C zlib) can. 
 
 > [!IMPORTANT]  
-> Use V2 of this library  via `go get github.com/4kills/go-libdeflate/v2`!
+> Use V2 of this library  via `go get github.com/4kills/go-libdeflate/v2` !
 
 > [!WARNING]  
 > V1 will be deprecated by January 19, 2025. Until then it will receive bug fixes but no feature improvements.
@@ -143,13 +143,13 @@ dc, err := libdeflate.NewDecompressor()
 Then you can decompress the actual data with a given mode of compression (currently supported: zlib, gzip, raw deflate): 
 
 ```go 
-// must be exactly the size of the output, if unknown, pass nil for out(see below)
+// must be at least the size of the output. Knowing the uncompressed size is the fastest option. If uncompressed size is unknown, pass nil for out (see further below).
 decompressed := make([]byte, len(decomp)) 
 
 _, err = dc.Decompress(comp, decompressed, ModeZlib) 
 ```
 
-Just like with compress you can also pass nil and get a fitting buffer:
+Just like with compress, you can also pass nil and get a fitting buffer. This will generally be slower and waste memory compared to supplying a fitting buffer:
 
 ```go
 decompressed, err = dc.Decompress(comp, nil, ModeZlib)
@@ -167,7 +167,7 @@ There are also convenience functions that allow one-time compression to be easie
 
 - **Do NOT use the <ins>same</ins> Compressor / Decompressor across multiple threads <ins>simultaneously</ins>.** However, you can create as many of them as you like, so if you want to parallelize your application, just create a compressor / decompressor for each thread. (See Memory Usage down below for more info)
 
-- **Always `Close()` your Compressor / Decompressor when you are done with it** - especially if you create a new compressor/decompressor for each compression/decompression you undertake (which is generally discouraged anyway). As the C-part of this library is not subject to the Go garbage collector, the memory allocated by it must be released manually (by a call to `Close()`) to avoid memory leakage.
+- **Always `Close()` your Compressor / Decompressor when you are done with it** - especially if you create a new compressor/decompressor for each compression/decompression you undertake (which is generally discouraged anyway). As the C-part of this library is not subject to the Go garbage collector, the memory allocated by it must be released manually (by a call to `Close()`) to avoid memory leakage. However, there is a 'constructor' that gives you a (de-)compressor that auto-closes.
 
 - Memory Usage: `Compressing` requires at least ~32 KiB of additional memory during execution, while `Decompressing` also requires at least ~32 KiB of additional memory during execution. 
 
