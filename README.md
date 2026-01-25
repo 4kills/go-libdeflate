@@ -81,6 +81,11 @@ brew install pkg-config
 #### Linux:
 Use the package manager available on your distro to install the required packages. 
 
+Using `apt` (Debian, Ubuntu, Mint, ...):
+```sh
+sudo apt install pkg-config libdeflate-dev
+``` 
+
 #### Windows (MinGW/WSL2):
 Here, you can either use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install)
 or [MinGW](https://www.mingw-w64.org/) and from there install the required packages. 
