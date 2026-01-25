@@ -35,7 +35,7 @@ func CompressZlibLevel(in, out []byte, level int) (int, []byte, error) {
 //
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
-// If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
+// If out == nil: For a too large discrepancy (len(out) > 1024 + 2 * len(in)) Compress will error
 func Compress(in, out []byte, m Mode) (int, []byte, error) {
 	return CompressLevel(in, out, m, DefaultCompressionLevel)
 }
@@ -52,7 +52,7 @@ func Compress(in, out []byte, m Mode) (int, []byte, error) {
 //
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
-// If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
+// If out == nil: For a too large discrepancy (len(out) > 1024 + 2 * len(in)) Compress will error
 func CompressLevel(in, out []byte, m Mode, level int) (int, []byte, error) {
 	c, err := NewCompressorLevel(level)
 	if err != nil {

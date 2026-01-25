@@ -73,7 +73,7 @@ func (c Compressor) CompressZlib(in, out []byte) (int, []byte, error) {
 //
 // Notice that for extremely small or already highly compressed data,
 // the compressed data could be larger than uncompressed.
-// If out == nil: For a too large discrepancy (len(out) > 1000 + 2 * len(in)) Compress will error
+// If out == nil: For a too large discrepancy (len(out) > 1024 + 2 * len(in)) Compress will error
 func (c Compressor) Compress(in, out []byte, m Mode) (int, []byte, error) {
 	switch m {
 	case ModeZlib:

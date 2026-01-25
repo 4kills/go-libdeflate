@@ -19,9 +19,9 @@ type Decompressor struct {
 	maxDecompressionFactor int
 }
 
-// NewDecompressor returns a new Decompressor with maxDecompressionFactor = 30 or and error if out of memory
+// NewDecompressor returns a new Decompressor with maxDecompressionFactor = 32 or and error if out of memory
 func NewDecompressor() (*Decompressor, error) {
-	return NewDecompressorWithExtendedDecompression(30)
+	return NewDecompressorWithExtendedDecompression(32)
 }
 
 // NewDecompressorWithExtendedDecompression returns a new Decompressor with maxDecompressionFactor or and error if out of memory
@@ -54,7 +54,7 @@ func (dc *Decompressor) Decompress(in, out []byte, f decompress) (int, []byte, e
 
 	cons := 0
 	n := 0
-	decompFactor := 6
+	decompFactor := 4
 	if dc.maxDecompressionFactor < decompFactor {
 		decompFactor = dc.maxDecompressionFactor
 	}
@@ -67,11 +67,7 @@ func (dc *Decompressor) Decompress(in, out []byte, f decompress) (int, []byte, e
 			return cons, out, errorInsufficientDecompressionFactor
 		}
 
-		if decompFactor >= 16 {
-			decompFactor += 3
-			continue
-		}
-		decompFactor += 5
+		decompFactor *= 2
 	}
 
 	return cons, out[:n], err
